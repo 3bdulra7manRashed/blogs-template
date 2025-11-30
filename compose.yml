@@ -23,7 +23,7 @@ services:
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_KEY=${APP_KEY:-}
       - APP_NAME=${APP_NAME:-Laravel}
-      - APP_URL=${APP_URL:-${SERVICE_FQDN_APP:-http://localhost:8000}}
+      - APP_URL=https://${SERVICE_FQDN_APP}
       - APP_MAINTENANCE_DRIVER=${APP_MAINTENANCE_DRIVER:-file}
       # Database configuration
       - DB_CONNECTION=mysql
@@ -31,7 +31,7 @@ services:
       - DB_PORT=3306
       - DB_DATABASE=${DB_DATABASE:-laravel}
       - DB_USERNAME=${DB_USERNAME:-laravel}
-      - DB_PASSWORD=${DB_PASSWORD:-${SERVICE_PASSWORD_MYSQLROOT:-laravel}}
+      - DB_PASSWORD=${SERVICE_PASSWORD_MYSQLROOT}
       # Cache & Session
       - CACHE_STORE=${CACHE_STORE:-file}
       - SESSION_DRIVER=${SESSION_DRIVER:-file}
@@ -54,13 +54,13 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-${SERVICE_PASSWORD_MYSQLROOT:-root}}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_MYSQLROOT}
       MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-${SERVICE_PASSWORD_MYSQLROOT:-laravel}}
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_MYSQLROOT}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 5
