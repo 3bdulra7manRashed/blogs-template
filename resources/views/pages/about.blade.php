@@ -23,19 +23,14 @@
                  class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
         </div>
 
-        <!-- Biography Content (Without Card) -->
-        <article class="prose prose-lg prose-slate max-w-none 
-                        rtl:prose-p:text-right rtl:prose-headings:text-right 
-                        font-serif prose-headings:text-brand-accent prose-headings:font-bold
-                        prose-p:text-gray-600 prose-p:leading-loose ck-content">
+        <!-- Biography Content -->
+        <div class="ckeditor-content" dir="rtl">
             @if($user->biography)
-                <div class="ckeditor-content">
-                    {!! $user->biography !!}
-                </div>
+                {!! $user->biography !!}
             @else
                 <p class="text-gray-500 text-center py-8">لم تتم إضافة نبذة تعريفية بعد.</p>
             @endif
-        </article>
+        </div>
 
     </div>
     @else

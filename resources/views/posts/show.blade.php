@@ -2,6 +2,20 @@
 
 @section('title', $post->title . ' - ' . config('app.name'))
 
+@push('styles')
+<style>
+    /* Post Title Line Height for Better Multi-line Spacing */
+    .post-title {
+        line-height: 1.6 !important;
+    }
+    
+    .post-title span {
+        line-height: inherit !important;
+        display: inline;
+    }
+</style>
+@endpush
+
 @push('meta')
 <meta name="description" content="{{ $post->excerpt ?? $post->meta['description'] ?? '' }}">
 <meta property="og:title" content="{{ $post->title }}">
@@ -33,7 +47,7 @@
                 </div>
             @endif
 
-            <h1 class="text-4xl md:text-5xl font-serif font-bold text-brand-primary mb-6 leading-tight">
+            <h1 class="post-title text-4xl md:text-5xl font-serif font-bold text-brand-primary mb-6">
                 {{ $post->title }}
             </h1>
 

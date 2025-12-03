@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 <div class="mb-6 bg-white p-4 rounded-lg shadow">
     <form method="GET" action="{{ route('admin.posts.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="بحث في المقالات..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
-        <select name="status" class=" py-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
+        <select name="status" class="py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
             <option value="">جميع الحالات</option>
             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>مسودة</option>
             <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>منشور</option>
