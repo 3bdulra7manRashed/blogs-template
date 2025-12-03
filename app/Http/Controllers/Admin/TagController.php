@@ -38,6 +38,12 @@ class TagController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120', 'unique:tags,name'],
             'slug' => ['nullable', 'string', 'max:160', 'unique:tags,slug'],
+        ], [
+            'name.required' => 'اسم الوسم مطلوب',
+            'name.max' => 'اسم الوسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم الوسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
@@ -62,6 +68,12 @@ class TagController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120', 'unique:tags,name,' . $tag->id],
             'slug' => ['nullable', 'string', 'max:160', 'unique:tags,slug,' . $tag->id],
+        ], [
+            'name.required' => 'اسم الوسم مطلوب',
+            'name.max' => 'اسم الوسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم الوسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
         ]);
 
         if (isset($validated['slug'])) {
@@ -71,7 +83,7 @@ class TagController extends Controller
         $tag->update($validated);
 
         return redirect()->route('admin.tags.index')
-            ->with('success', 'Tag updated successfully.');
+            ->with('success', 'تم تحديث الوسم بنجاح.');
     }
 
     public function destroy(Tag $tag): RedirectResponse
@@ -81,7 +93,7 @@ class TagController extends Controller
         $tag->delete();
 
         return redirect()->route('admin.tags.index')
-            ->with('success', 'Tag deleted successfully.');
+            ->with('success', 'تم حذف الوسم بنجاح.');
     }
 }
 

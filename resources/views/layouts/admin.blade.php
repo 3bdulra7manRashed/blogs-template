@@ -68,7 +68,7 @@
         <div role="dialog" aria-modal="true" aria-labelledby="site-confirm-title"
              class="relative bg-white rounded-lg shadow-2xl max-w-lg w-[90%] md:w-1/2 p-6 text-center mx-auto">
             <button id="site-confirm-close" aria-label="close"
-                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors text-2xl leading-none">&times;</button>
 
             <h3 id="site-confirm-title" class="text-xl font-semibold text-gray-800 mb-3">تأكيد الإجراء</h3>
 
@@ -82,9 +82,9 @@
                 <p id="site-confirm-error" class="text-sm text-red-600 mt-2 hidden"></p>
             </div>
 
-            <div class="flex items-center justify-center gap-4">
-                <button id="site-confirm-cancel" class="px-5 py-2 rounded border">إلغاء</button>
-                <button id="site-confirm-ok" class="px-6 py-2 rounded bg-rose-500 text-white">تأكيد</button>
+            <div class="flex items-center justify-center gap-4" dir="rtl">
+                <button id="site-confirm-ok" class="px-6 py-2.5 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md">حذف</button>
+                <button id="site-confirm-cancel" class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200">إلغاء</button>
             </div>
         </div>
     </div>

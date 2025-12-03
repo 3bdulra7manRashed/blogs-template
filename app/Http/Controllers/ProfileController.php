@@ -46,8 +46,8 @@ class ProfileController extends Controller
                 // Check if HTMLPurifier is available
                 if (class_exists('HTMLPurifier')) {
                     $config = \HTMLPurifier_Config::createDefault();
-                    // Allow common formatting tags
-                    $config->set('HTML.Allowed', 'p,br,strong,b,em,i,u,ul,ol,li,h1,h2,h3,h4,h5,h6,a[href],img[src|alt|width|height]');
+                    // Allow CKEditor formatting tags including blockquote, table, figure
+                    $config->set('HTML.Allowed', 'p,br,strong,b,em,i,u,ul,ol,li,h1,h2,h3,h4,h5,h6,a[href|target],img[src|alt|width|height],blockquote,table,thead,tbody,tr,th,td,figure,figcaption,div[class],span[class]');
                     $config->set('HTML.TargetBlank', true);
                     $config->set('AutoFormat.AutoParagraph', true);
                     $config->set('AutoFormat.Linkify', true);
@@ -55,8 +55,8 @@ class ProfileController extends Controller
                     $purifier = new \HTMLPurifier($config);
                     $biographySanitized = $purifier->purify((string) $biographyRaw);
                 } else {
-                    // Fallback: Use strip_tags with allowed tags
-                    $biographySanitized = strip_tags((string) $biographyRaw, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img>');
+                    // Fallback: Use strip_tags with allowed tags (including blockquote, table elements, figure)
+                    $biographySanitized = strip_tags((string) $biographyRaw, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img><blockquote><table><thead><tbody><tr><th><td><figure><figcaption><div><span>');
                     // Clean up attributes on allowed tags (basic sanitization)
                     $biographySanitized = preg_replace('/<a\s+[^>]*href=["\']([^"\']*)["\'][^>]*>/i', '<a href="$1" target="_blank">', $biographySanitized);
                     $biographySanitized = preg_replace('/<img\s+[^>]*src=["\']([^"\']*)["\'][^>]*>/i', '<img src="$1" alt="">', $biographySanitized);
@@ -81,7 +81,7 @@ class ProfileController extends Controller
         
         // Only allow super admin or user ID 1 to update biography
         if (!$user->is_super_admin && $user->id !== 1) {
-            abort(403, 'Unauthorized');
+            abort(403, 'غير مصرح');
         }
 
         $data = $request->validate([
@@ -95,8 +95,8 @@ class ProfileController extends Controller
             // Check if HTMLPurifier is available
             if (class_exists('HTMLPurifier')) {
                 $config = \HTMLPurifier_Config::createDefault();
-                // Allow common formatting tags
-                $config->set('HTML.Allowed', 'p,br,strong,b,em,i,u,ul,ol,li,h1,h2,h3,h4,h5,h6,a[href],img[src|alt|width|height]');
+                // Allow CKEditor formatting tags including blockquote, table, figure
+                $config->set('HTML.Allowed', 'p,br,strong,b,em,i,u,ul,ol,li,h1,h2,h3,h4,h5,h6,a[href|target],img[src|alt|width|height],blockquote,table,thead,tbody,tr,th,td,figure,figcaption,div[class],span[class]');
                 $config->set('HTML.TargetBlank', true);
                 $config->set('AutoFormat.AutoParagraph', true);
                 $config->set('AutoFormat.Linkify', true);
@@ -104,8 +104,8 @@ class ProfileController extends Controller
                 $purifier = new \HTMLPurifier($config);
                 $biographySanitized = $purifier->purify((string) $biographyRaw);
             } else {
-                // Fallback: Use Laravel's built-in HTML sanitization or strip_tags
-                $biographySanitized = strip_tags((string) $biographyRaw, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img>');
+                // Fallback: Use strip_tags with allowed tags (including blockquote, table elements, figure)
+                $biographySanitized = strip_tags((string) $biographyRaw, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img><blockquote><table><thead><tbody><tr><th><td><figure><figcaption><div><span>');
                 // Clean up attributes on allowed tags (basic sanitization)
                 $biographySanitized = preg_replace('/<a\s+[^>]*href=["\']([^"\']*)["\'][^>]*>/i', '<a href="$1" target="_blank">', $biographySanitized);
                 $biographySanitized = preg_replace('/<img\s+[^>]*src=["\']([^"\']*)["\'][^>]*>/i', '<img src="$1" alt="">', $biographySanitized);

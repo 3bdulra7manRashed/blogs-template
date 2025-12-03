@@ -28,7 +28,6 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:200', Rule::unique('posts', 'slug')->ignore($postId)],
-            'excerpt' => ['nullable', 'string', 'max:400'],
             'content' => ['required', 'string'],
             'featured_image' => ['nullable', 'image', 'max:3072'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
@@ -39,6 +38,21 @@ class UpdatePostRequest extends FormRequest
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
             'meta' => ['nullable', 'array'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'عنوان المقال مطلوب',
+            'title.max' => 'عنوان المقال يجب أن لا يتجاوز 180 حرف',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 200 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
+            'content.required' => 'محتوى المقال مطلوب',
+            'featured_image.image' => 'يجب أن يكون الملف صورة',
+            'featured_image.max' => 'حجم الصورة يجب أن لا يتجاوز 3 ميجابايت',
+            'categories.*.exists' => 'القسم المحدد غير موجود',
+            'tags.*.exists' => 'الوسم المحدد غير موجود',
         ];
     }
 }

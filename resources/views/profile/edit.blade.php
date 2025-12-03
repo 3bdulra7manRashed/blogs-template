@@ -86,4 +86,30 @@
             </div>
         </div>
     </div>
+
+    <!-- CKEditor Scripts -->
+    @ckeditorScripts
+
+    <!-- Additional Profile Form Sync Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileForm = document.getElementById('profile-form');
+            
+            if (profileForm) {
+                // Add submit handler with higher priority
+                profileForm.addEventListener('submit', function(e) {
+                    // Find biography textarea
+                    const biographyTextarea = document.querySelector('textarea[name="biography"]');
+                    
+                    if (biographyTextarea && biographyTextarea.ckeditorInstance) {
+                        // Sync editor content to textarea
+                        const editorData = biographyTextarea.ckeditorInstance.getData();
+                        biographyTextarea.value = editorData;
+                        
+                        console.log('Biography synced:', editorData.substring(0, 100) + '...');
+                    }
+                }, true); // Use capture phase for earlier execution
+            }
+        });
+    </script>
 </x-app-layout>

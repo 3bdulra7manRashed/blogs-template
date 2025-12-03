@@ -67,7 +67,7 @@ class UserController extends Controller
 
         // Only super admin can create other super admins
         if ($request->boolean('is_super_admin') && !auth()->user()->isSuperAdmin()) {
-            abort(403, 'Only Super Admin can create other Super Admins');
+            abort(403, 'فقط المشرف الرئيسي يمكنه إنشاء مشرفين رئيسيين آخرين');
         }
 
         if (empty($data['password'])) {

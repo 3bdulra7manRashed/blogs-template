@@ -46,6 +46,9 @@
                              x-transition:leave-end="opacity-0 translate-y-1"
                              class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50"
                              style="display: none;">
+                            <a href="{{ route('home') }}" class="block px-4 py-2 text-ms text-gray-700 hover:bg-gray-50 hover:text-brand-accent transition-colors">
+                                المقالات الحديثة
+                            </a>
                             <a href="{{ route('posts.most-liked') }}" class="block px-4 py-2 text-ms text-gray-700 hover:bg-gray-50 hover:text-brand-accent transition-colors">
                                 المقالات الأكثر إعجاباً
                             </a>

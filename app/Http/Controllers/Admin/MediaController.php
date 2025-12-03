@@ -65,7 +65,7 @@ class MediaController extends Controller
         }
 
         return redirect()->route('admin.media.index')
-            ->with('success', 'Media uploaded successfully.');
+            ->with('success', 'تم رفع الملف بنجاح.');
     }
 
     public function upload(Request $request)

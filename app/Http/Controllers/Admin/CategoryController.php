@@ -40,6 +40,13 @@ class CategoryController extends Controller
             'slug' => ['nullable', 'string', 'max:160', 'unique:categories,slug'],
             'description' => ['nullable', 'string'],
             'order_column' => ['nullable', 'integer'],
+        ], [
+            'name.required' => 'اسم القسم مطلوب',
+            'name.max' => 'اسم القسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم القسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
+            'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
@@ -67,6 +74,13 @@ class CategoryController extends Controller
             'slug' => ['nullable', 'string', 'max:160', 'unique:categories,slug,' . $category->id],
             'description' => ['nullable', 'string'],
             'order_column' => ['nullable', 'integer'],
+        ], [
+            'name.required' => 'اسم القسم مطلوب',
+            'name.max' => 'اسم القسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم القسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
+            'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
         if (isset($validated['slug'])) {
@@ -76,7 +90,7 @@ class CategoryController extends Controller
         $category->update($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category updated successfully.');
+            ->with('success', 'تم تحديث القسم بنجاح.');
     }
 
     public function destroy(Category $category): RedirectResponse
@@ -86,7 +100,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category deleted successfully.');
+            ->with('success', 'تم حذف القسم بنجاح.');
     }
 }
 

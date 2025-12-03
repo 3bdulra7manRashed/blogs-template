@@ -21,7 +21,7 @@
             <div class="bg-white p-6 rounded shadow">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">اسم الوسم</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required 
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" 
                            class="w-full px-4 py-3 text-xl font-bold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent @error('name') border-red-500 @enderror"
                            placeholder="أدخل اسم الوسم هنا">
                     @error('name')
