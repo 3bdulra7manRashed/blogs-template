@@ -131,7 +131,7 @@
             <!-- Categories -->
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">الأقسام</h3>
-                <div class="max-h-60 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+                <div id="categories-list" class="max-h-60 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
                     @foreach($categories as $category)
                         <label class="flex items-center space-x-2 space-x-reverse cursor-pointer hover:bg-gray-50 p-1 rounded">
                             <input type="checkbox" name="categories[]" value="{{ $category->id }}" 
@@ -142,10 +142,10 @@
                     @endforeach
                 </div>
                 <div class="mt-3 pt-3 border-t">
-                    <a href="{{ route('admin.categories.index') }}" target="_blank" class="text-xs text-brand-accent hover:underline flex items-center">
+                    <button type="button" onclick="openCategoryModal()" class="text-xs text-brand-accent hover:underline flex items-center font-medium">
                         <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         إضافة قسم جديد
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -162,11 +162,20 @@
                     </select>
                     <p class="text-xs text-gray-500 mt-1">اضغط Ctrl (أو Cmd) لتحديد متعدد</p>
                 </div>
+                <div class="mt-3 pt-3 border-t">
+                    <button type="button" onclick="openTagModal()" class="text-xs text-brand-accent hover:underline flex items-center font-medium">
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        إضافة وسم جديد
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
 </form>
+
+@include('admin.posts.partials.category-quick-add-modal')
+@include('admin.posts.partials.tag-quick-add-modal')
 @endsection
 
 @push('styles')
@@ -184,6 +193,22 @@
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #9ca3af; 
+    }
+    
+    /* Fade in animation for new categories */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
     }
 </style>
 @endpush

@@ -67,7 +67,7 @@
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">الإجراءات</h3>
 
-                <div class="flex items-center justify-between pt-4 border-t mt-4">
+                <div class="flex items-center justify-between pt-4">
                     <a href="{{ route('admin.tags.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors text-sm font-medium">
                         إلغاء
                     </a>

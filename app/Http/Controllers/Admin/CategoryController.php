@@ -31,7 +31,7 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         Gate::authorize('create', Category::class);
 
@@ -52,7 +52,16 @@ class CategoryController extends Controller
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
         $validated['order_column'] = $validated['order_column'] ?? Category::max('order_column') + 1;
 
-        Category::create($validated);
+        $category = Category::create($validated);
+
+        // Return JSON for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء القسم بنجاح',
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')
         ->with('success', 'تم إنشاء القسم بنجاح');

@@ -31,7 +31,7 @@ class TagController extends Controller
         return view('admin.tags.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         Gate::authorize('create', Tag::class);
 
@@ -48,7 +48,16 @@ class TagController extends Controller
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
 
-        Tag::create($validated);
+        $tag = Tag::create($validated);
+
+        // Return JSON for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء الوسم بنجاح',
+                'tag' => $tag
+            ]);
+        }
 
         return redirect()->route('admin.tags.index')
         ->with('success', 'تم إنشاء الوسم بنجاح');
