@@ -31,14 +31,18 @@ RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
 
-# Install Composer dependencies (this layer is cached unless composer files change)
-RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+# Install Composer dependencies without scripts (artisan doesn't exist yet)
+# This layer is cached unless composer files change
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
 # Install npm dependencies (this layer is cached unless package files change)
 RUN npm ci --prefer-offline --no-audit
 
 # Copy application code (this layer invalidates only when code changes)
 COPY . .
+
+# Run Composer scripts now that artisan exists (package discovery, etc.)
+RUN composer dump-autoload --optimize --no-interaction
 
 # Build frontend assets (uses cached npm dependencies if code-only changes)
 RUN npm run build && rm -rf node_modules && npm cache clean --force
