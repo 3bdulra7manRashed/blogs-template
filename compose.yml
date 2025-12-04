@@ -64,22 +64,8 @@ services:
       timeout: 5s
       retries: 5
 
-  node:
-    image: node:20-alpine
-    container_name: ${COMPOSE_PROJECT_NAME:-laravel-blog}-node
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-      - node_modules:/var/www/html/node_modules
-    command: >
-      sh -c "npm install
-      && npm run build
-      && echo 'Assets built successfully!'"
-
 volumes:
   mysql_data:
-    driver: local
-  node_modules:
     driver: local
   storage:
     driver: local

@@ -16,4 +16,5 @@ yarn-error.log
 /.vscode
 /.fleet
 /.DS_Store
+/public/build
 Thumbs.db

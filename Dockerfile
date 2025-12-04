@@ -16,6 +16,10 @@ RUN echo "opcache.enable=1" > /usr/local/etc/php/conf.d/custom.ini \
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
+# Install Node.js for building assets
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt install -y nodejs
+
 WORKDIR /var/www/html
 
 RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache
@@ -26,7 +30,11 @@ COPY . .
 
 RUN chown -R unit:unit storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
+# Install Composer dependencies
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+# Build frontend assets
+RUN npm ci --omit=dev && npm run build && npm cache clean --force
 
 COPY unit.json /docker-entrypoint.d/unit.json
 
