@@ -7,15 +7,14 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html
-      - ./storage:/var/www/html/storage
-      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      # Use named volumes so permissions from the image (user "unit") are preserved
+      - storage:/var/www/html/storage
+      - bootstrap_cache:/var/www/html/bootstrap/cache
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       # Coolify magic variables (auto-provided by Coolify)
-      - SERVICE_URL_APP_8000
       - SERVICE_FQDN_APP
       - SERVICE_PASSWORD_MYSQLROOT
       # Laravel core configuration
@@ -81,4 +80,8 @@ volumes:
   mysql_data:
     driver: local
   node_modules:
+    driver: local
+  storage:
+    driver: local
+  bootstrap_cache:
     driver: local
