@@ -22,20 +22,32 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 WORKDIR /var/www/html
 
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache
+# Create storage directories with correct permissions
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R unit:unit /var/www/html/storage bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage
 
-RUN chown -R unit:unit /var/www/html/storage bootstrap/cache && chmod -R 775 /var/www/html/storage
+# Copy dependency files first for better layer caching
+COPY composer.json composer.lock ./
+COPY package.json package-lock.json ./
 
-COPY . .
-
-RUN chown -R unit:unit storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
-
-# Install Composer dependencies
+# Install Composer dependencies (this layer is cached unless composer files change)
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
-# Build frontend assets
-RUN npm ci --omit=dev && npm run build && npm cache clean --force
+# Install npm dependencies (this layer is cached unless package files change)
+RUN npm ci --prefer-offline --no-audit
 
+# Copy application code (this layer invalidates only when code changes)
+COPY . .
+
+# Build frontend assets (uses cached npm dependencies if code-only changes)
+RUN npm run build && rm -rf node_modules && npm cache clean --force
+
+# Set permissions for copied files
+RUN chown -R unit:unit storage bootstrap/cache . \
+    && chmod -R 775 storage bootstrap/cache
+
+# Copy unit.json configuration
 COPY unit.json /docker-entrypoint.d/unit.json
 
 EXPOSE 8000
