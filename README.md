@@ -1,4 +1,4 @@
-# Writer Theme Blog — Laravel 12
+# Demo Theme Blog — Laravel 12
 
 A Laravel 12 + Tailwind CSS v4 project that replicates the “Writing Blog / Personal Blog (Writer)” theme. The project ships with Laravel Breeze authentication, custom theming, and all PRD requirements for building a Writer-inspired CMS.
 

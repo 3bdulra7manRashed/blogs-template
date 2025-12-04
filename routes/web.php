@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/bio', [ProfileController::class, 'updateBio'])->name('profile.updateBio');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // CKEditor image upload route
+    Route::post('/ckeditor/upload', [\App\Http\Controllers\CkeditorController::class, 'upload'])->name('ckeditor.upload');
 });
 
 // Admin routes - Protected by role:admin|moderator middleware

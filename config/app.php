@@ -45,7 +45,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Riyadh',
 
     /*
     |--------------------------------------------------------------------------
@@ -108,6 +108,7 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
+        App\Providers\CKEditorServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         // App\Providers\EventServiceProvider::class,
         // App\Providers\RouteServiceProvider::class, // Laravel 11 handles routes via bootstrap/app.php usually

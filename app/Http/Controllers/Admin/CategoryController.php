@@ -31,7 +31,7 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         Gate::authorize('create', Category::class);
 
@@ -40,12 +40,28 @@ class CategoryController extends Controller
             'slug' => ['nullable', 'string', 'max:160', 'unique:categories,slug'],
             'description' => ['nullable', 'string'],
             'order_column' => ['nullable', 'integer'],
+        ], [
+            'name.required' => 'اسم القسم مطلوب',
+            'name.max' => 'اسم القسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم القسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
+            'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
         $validated['order_column'] = $validated['order_column'] ?? Category::max('order_column') + 1;
 
-        Category::create($validated);
+        $category = Category::create($validated);
+
+        // Return JSON for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء القسم بنجاح',
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')
         ->with('success', 'تم إنشاء القسم بنجاح');
@@ -67,6 +83,13 @@ class CategoryController extends Controller
             'slug' => ['nullable', 'string', 'max:160', 'unique:categories,slug,' . $category->id],
             'description' => ['nullable', 'string'],
             'order_column' => ['nullable', 'integer'],
+        ], [
+            'name.required' => 'اسم القسم مطلوب',
+            'name.max' => 'اسم القسم يجب أن لا يتجاوز 120 حرف',
+            'name.unique' => 'اسم القسم مستخدم مسبقاً',
+            'slug.max' => 'الرابط الدائم يجب أن لا يتجاوز 160 حرف',
+            'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
+            'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
         if (isset($validated['slug'])) {
@@ -76,7 +99,7 @@ class CategoryController extends Controller
         $category->update($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category updated successfully.');
+            ->with('success', 'تم تحديث القسم بنجاح.');
     }
 
     public function destroy(Category $category): RedirectResponse
@@ -86,7 +109,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category deleted successfully.');
+            ->with('success', 'تم حذف القسم بنجاح.');
     }
 }
 

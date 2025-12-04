@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 <div class="mb-6 bg-white p-4 rounded-lg shadow">
     <form method="GET" action="{{ route('admin.posts.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="بحث في المقالات..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
-        <select name="status" class=" py-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
+        <select name="status" class="py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
             <option value="">جميع الحالات</option>
             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>مسودة</option>
             <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>منشور</option>
@@ -84,10 +84,11 @@ use Illuminate\Support\Str;
                                     </svg>
                                     تعديل
                                 </a>
-                                <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المقال؟');">
+                                <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 hover:text-red-800 font-medium text-xs transition-colors duration-200">
+                                    <button type="submit" class="js-confirm inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 hover:text-red-800 font-medium text-xs transition-colors duration-200"
+                                            data-confirm-message="هل أنت متأكد من حذف هذا المقال؟">
                                         <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>

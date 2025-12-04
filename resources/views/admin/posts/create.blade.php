@@ -21,7 +21,7 @@
             <div class="bg-white p-6 rounded shadow">
                 <div class="mb-4">
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-2">عنوان المقال</label>
-                    <input type="text" name="title" id="title" value="{{ old('title') }}" required 
+                    <input type="text" name="title" id="title" value="{{ old('title') }}" 
                            class="w-full px-4 py-3 text-xl font-bold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent @error('title') border-red-500 @enderror"
                            placeholder="أدخل عنوان المقال هنا">
                     @error('title')
@@ -44,22 +44,11 @@
                 </div>
             </div>
 
-            <!-- Excerpt -->
-            <div class="bg-white p-6 rounded shadow">
-                <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-2">مقتطف (ملخص المقال)</label>
-                <textarea name="excerpt" id="excerpt" rows="3" 
-                          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent @error('excerpt') border-red-500 @enderror"
-                          placeholder="اكتب ملخصًا قصيرًا للمقال يظهر في قوائم التصفح...">{{ old('excerpt') }}</textarea>
-                @error('excerpt')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
             <!-- Content Editor -->
             <div class="bg-white p-6 rounded shadow">
                 <label for="content" class="block text-sm font-medium text-gray-700 mb-2">محتوى المقال</label>
                 <div class="@error('content') border border-red-500 rounded @enderror">
-                    <textarea id="content" name="content" rows="8">{{ old('content', '') }}</textarea>
+                    @ckeditor('content')
                 </div>
                 @error('content')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -133,7 +122,7 @@
             <!-- Categories -->
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">الأقسام</h3>
-                <div class="max-h-60 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+                <div id="categories-list" class="max-h-60 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
                     @foreach($categories as $category)
                         <label class="flex items-center space-x-2 space-x-reverse cursor-pointer hover:bg-gray-50 p-1 rounded">
                             <input type="checkbox" name="categories[]" value="{{ $category->id }}" 
@@ -144,10 +133,10 @@
                     @endforeach
                 </div>
                 <div class="mt-3 pt-3 border-t">
-                    <a href="{{ route('admin.categories.index') }}" target="_blank" class="text-xs text-brand-accent hover:underline flex items-center">
+                    <button type="button" onclick="openCategoryModal()" class="text-xs text-brand-accent hover:underline flex items-center font-medium">
                         <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         إضافة قسم جديد
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -164,60 +153,24 @@
                     </select>
                     <p class="text-xs text-gray-500 mt-1">اضغط Ctrl (أو Cmd) لتحديد متعدد</p>
                 </div>
+                <div class="mt-3 pt-3 border-t">
+                    <button type="button" onclick="openTagModal()" class="text-xs text-brand-accent hover:underline flex items-center font-medium">
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        إضافة وسم جديد
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
 </form>
+
+@include('admin.posts.partials.category-quick-add-modal')
+@include('admin.posts.partials.tag-quick-add-modal')
 @endsection
 
 @push('styles')
 <style>
-    /* Prevent hidden editor */
-    #content {
-        min-height: 200px;
-    }
-    .ck-editor__editable {
-        min-height: 700px !important;
-        max-height: 90vh !important;
-        overflow-y: auto !important;
-        padding: 40px !important;
-        line-height: 1.8 !important;
-        font-size: 16px !important;
-    }
-    
-    /* Professional Editor Styles - Like Word */
-    .ck-content {
-        font-family: 'Cairo', sans-serif;
-    }
-    
-    .ck-content ul {
-        list-style-type: disc;
-        padding-right: 20px;
-    }
-    .ck-content ol {
-        list-style-type: decimal;
-        padding-right: 20px;
-    }
-    .ck-content h2 {
-        font-size: 1.5em;
-        font-weight: bold;
-        margin: 1em 0;
-    }
-    .ck-content h3 {
-        font-size: 1.17em;
-        font-weight: bold;
-        margin: 0.8em 0;
-    }
-    .ck-content h4 {
-        font-size: 1em;
-        font-weight: bold;
-        margin: 0.8em 0;
-    }
-    .ck-content p {
-        margin-bottom: 0.8em;
-    }
-    
     /* Custom scrollbar for categories */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
@@ -232,130 +185,32 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #9ca3af; 
     }
+    
+    /* Fade in animation for new categories */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
 </style>
 @endpush
 
 @push('scripts')
-<!-- CKEditor 5 Classic Build CDN -->
-<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/translations/ar.js"></script>
+@ckeditorScripts
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        
-        // ==========================================
-        // 1. تعريف كلاس الرفع المخصص (Custom Adapter)
-        // ==========================================
-        class CustomImageUploadAdapter {
-            constructor(loader) {
-                this.loader = loader;
-            }
-    
-            upload() {
-                return this.loader.file
-                    .then(file => new Promise((resolve, reject) => {
-                        const data = new FormData();
-                        data.append('upload', file);
-                        // جلب التوكن من الميتا تاج
-                        data.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
-    
-                        fetch('{{ route("admin.upload.image") }}', { 
-                            method: 'POST',
-                            body: data,
-                            // لا نضع headers هنا لأن FormData يضع الـ Content-Type تلقائياً
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.url) {
-                                resolve({
-                                    default: data.url // الرابط الذي سيعود للمحرر
-                                });
-                            } else {
-                                reject(data.error || 'فشل عملية الرفع');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Upload error:', error);
-                            reject('حدث خطأ أثناء رفع الصورة');
-                        });
-                    }));
-            }
-    
-            abort() {
-                // يمكن إضافة منطق إلغاء الرفع هنا إذا لزم الأمر
-            }
-        }
-    
-        // دالة لتفعيل الـ Adapter داخل المحرر
-        function CustomImageUploadAdapterPlugin(editor) {
-            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-                return new CustomImageUploadAdapter(loader);
-            };
-        }
-    
-        // ==========================================
-        // 2. تهيئة المحرر (CKEditor Initialization)
-        // ==========================================
-        const target = document.querySelector('#content');
-        if (!target) {
-            console.error("Textarea #content not found.");
-            return;
-        }
-    
-        ClassicEditor.create(target, {
-            language: { ui: 'ar', content: 'ar' },
-            placeholder: 'ابدأ كتابة مقالك هنا...',
-            
-            // هنا قمنا بإضافة البلاجن الخاص بالرفع
-            extraPlugins: [CustomImageUploadAdapterPlugin], 
-    
-            toolbar: {
-                shouldNotGroupWhenFull: true,
-                items: [
-                    'heading', '|',
-                    'bold', 'italic', 'underline', 'link', 'blockQuote', 'insertTable', '|',
-                    'bulletedList', 'numberedList', 'outdent', 'indent', '|',
-                    'mediaEmbed', 'imageUpload', 'undo', 'redo' // تأكد من وجود imageUpload
-                ]
-            },
-            mediaEmbed: {
-                previewsInData: true
-            },
-            // ملاحظة: قمنا بإزالة simpleUpload لأننا نستخدم CustomImageUploadAdapterPlugin بدلاً منه
-        })
-        .then(editor => { 
-            window.editor = editor;
-            
-            // التأكد من تحديث الحقل المخفي قبل إرسال الفورم
-            const form = document.getElementById('post-form'); // تأكد أن id الفورم صحيح
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    editor.updateSourceElement();
-                    
-                    const content = editor.getData();
-                    if (!content || content.trim() === '' || content === '<p>&nbsp;</p>') {
-                        e.preventDefault();
-                        alert('يرجى إدخال محتوى المقال قبل النشر');
-                        return false;
-                    }
-                });
-            }
-        })
-        .catch(error => { 
-            console.error("CKEditor error:", error); 
-            alert('حدث خطأ في تحميل المحرر. يرجى تحديث الصفحة.');
-        });
-    
-        // ==========================================
-        // 3. سكربت معاينة الصورة البارزة (Image Preview)
-        // ==========================================
-        const imageInput = document.getElementById('image'); // تأكد من ID حقل الصورة
-        if(imageInput){
-            imageInput.addEventListener('change', function() {
-               previewImage(this);
-            });
-        }
-    
-        window.previewImage = function(input) { // جعلناها global لتعمل مع استدعاء HTML onclick
+        // Image Preview Script
+        window.previewImage = function(input) {
             const previewBox = document.getElementById('image-preview');
             const previewImg = previewBox.querySelector('img');
             const placeholder = document.getElementById('upload-placeholder');
@@ -371,9 +226,7 @@
             }
         }
     
-        // ==========================================
-        // 4. مولد الرابط اللطيف (Auto-Slug)
-        // ==========================================
+        // Auto-Slug Generator
         const titleInput = document.getElementById('title');
         const slugInput = document.getElementById('slug');
         
@@ -393,6 +246,6 @@
             });
         }
     });
-    </script>
+</script>
 @endpush
 

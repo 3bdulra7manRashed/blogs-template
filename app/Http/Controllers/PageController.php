@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ContactFormRequest;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -41,18 +42,17 @@ class PageController extends Controller
         return view('pages.contact', compact('recentPosts', 'categories'));
     }
 
-    public function sendContact(Request $request)
+    public function sendContact(ContactFormRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'message' => ['required', 'string', 'max:5000'],
-        ]);
+        $validated = $request->validated();
 
         // TODO: Configure mail settings and create ContactMail mailable
         // Mail::to(config('mail.from.address'))->send(new ContactMail($validated));
 
-        return back()->with('success', 'Thank you for your message. We will get back to you soon!');
+        // Optional: Store contact messages in database
+        // ContactMessage::create($validated);
+
+        return back()->with('success', 'شكراً لرسالتك. سنقوم بالرد عليك قريباً!');
     }
 }
 

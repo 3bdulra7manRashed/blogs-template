@@ -21,7 +21,7 @@
             <div class="bg-white p-6 rounded shadow">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">اسم القسم</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required 
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" 
                            class="w-full px-4 py-3 text-xl font-bold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent @error('name') border-red-500 @enderror"
                            placeholder="أدخل اسم القسم هنا">
                     @error('name')
@@ -46,8 +46,14 @@
 
             <!-- Description -->
             <div class="bg-white p-6 rounded shadow">
-                <label for="content" class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
-                <textarea id="content" name="description" rows="8">{{ old('description', '') }}</textarea>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                <textarea 
+                    class="ckeditor" 
+                    name="description" 
+                    id="description"
+                    data-placeholder="أدخل وصف القسم هنا..."
+                    data-min-height="350px"
+                >{{ old('description', '') }}</textarea>
                 @error('description')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -99,68 +105,31 @@
 </form>
 @endsection
 
-@push('styles')
-<style>
-#content {
-    min-height: 200px;
-}
-.ck-editor__editable {
-    min-height: 250px !important;
-}
-</style>
-@endpush
-
 @push('scripts')
-<!-- CKEditor 5 Classic Build CDN -->
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+@ckeditorScripts
 
 <script>
-    // CKEditor 5 Initialization with Arabic/RTL Support
-    document.addEventListener('DOMContentLoaded', function () {
-        const target = document.querySelector('#content');
-        if (!target) {
-            console.error("Textarea #content not found.");
-            return;
-        }
-
-        ClassicEditor.create(target, {
-            language: { ui: 'ar', content: 'ar' }
-        })
-        .then(editor => { 
-            window.editor = editor;
-            
-            // Ensure content is synced before form submission
-            const form = document.getElementById('category-form');
-            if (form) {
-                form.addEventListener('submit', function() {
-                    editor.updateSourceElement();
-                });
-            }
-        })
-        .catch(error => { 
-            console.error("CKEditor error:", error); 
-        });
-    });
-
     // Auto-Slug Generator (Arabic Friendly)
-    const nameInput = document.getElementById('name');
-    const slugInput = document.getElementById('slug');
-    
-    if (nameInput && slugInput) {
-        nameInput.addEventListener('blur', function() {
-            // Only generate if slug is empty
-            if (slugInput.value.trim() === '') {
-                const name = this.value;
-                const slug = name.trim()
-                    .replace(/\s+/g, '-')           // Replace spaces with -
-                    .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Remove non-word chars (preserving Arabic & -)
-                    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-                    .replace(/^-+/, '')             // Trim - from start
-                    .replace(/-+$/, '');            // Trim - from end
-                
-                slugInput.value = slug;
-            }
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        
+        if (nameInput && slugInput) {
+            nameInput.addEventListener('blur', function() {
+                // Only generate if slug is empty
+                if (slugInput.value.trim() === '') {
+                    const name = this.value;
+                    const slug = name.trim()
+                        .replace(/\s+/g, '-')           // Replace spaces with -
+                        .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Remove non-word chars (preserving Arabic & -)
+                        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                        .replace(/^-+/, '')             // Trim - from start
+                        .replace(/-+$/, '');            // Trim - from end
+                    
+                    slugInput.value = slug;
+                }
+            });
+        }
+    });
 </script>
 @endpush
