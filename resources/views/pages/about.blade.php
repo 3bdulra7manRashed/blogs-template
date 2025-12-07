@@ -24,7 +24,7 @@
         </div>
 
         <!-- Biography Content -->
-        <div class="ckeditor-content" dir="rtl">
+        <div class="prose prose-lg max-w-none prose-headings:text-brand-primary prose-li:marker:text-brand-accent text-right" dir="rtl">
             @if($user->biography)
                 {!! $user->biography !!}
             @else

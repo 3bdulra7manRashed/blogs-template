@@ -21,8 +21,8 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-white text-brand-primary flex flex-col min-h-screen">
-    <!-- Top Navigation Bar -->
-    <div class="border-b border-gray-100 bg-white sticky top-0 z-40">
+    <!-- Top Navigation Bar (Hidden on mobile, visible on desktop) -->
+    <div class="hidden md:block border-b border-gray-100 bg-white sticky top-0 z-40">
         <div class="container mx-auto px-4 max-w-5xl">
             <div class="flex items-center justify-between h-12">
                 <!-- Right: Navigation Links (RTL: Right side) -->
@@ -101,50 +101,326 @@
         </div>
     </div>
 
-    <!-- Header (Logo & Menu Button) -->
-    <header class="bg-white z-30 py-8">
+    <!-- Header (Logo & Menu Button) - Sticky on mobile -->
+    <header class="bg-white sticky top-0 z-50 md:z-30 md:relative py-4 md:py-8 border-b border-gray-100 md:border-b-0" x-data="{ mobileMenuOpen: false, articlesOpen: false }" x-init="$watch('mobileMenuOpen', value => { if (value) { setTimeout(() => document.getElementById('mobile-menu-close')?.focus(), 100); } })">
         <div class="container mx-auto px-4 max-w-5xl">
             <div class="flex justify-between items-center">
                 <!-- Right: Logo -->
-                <a href="{{ route('home') }}" class="text-4xl font-serif font-bold text-brand-accent tracking-tight">
+                <a href="{{ route('home') }}" class="text-4xl md:text-4xl text-2xl font-serif font-bold text-brand-accent tracking-tight">
                     مدونة تجريبية
                 </a>
                 
-                <!-- Left: Menu Button -->
+                <!-- Left: Menu Button (Desktop) -->
                 <div class="hidden md:block">
                      <button id="sidebar-toggle" class="p-3 border border-gray-200 rounded-full hover:border-brand-accent transition-colors bg-gray-50">
                          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                      </button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden ml-4 text-gray-600" id="mobile-menu-button">
+                <!-- Mobile: Hamburger Button -->
+                <button 
+                    class="md:hidden text-gray-600 hover:text-brand-accent transition-colors p-2"
+                    id="mobile-menu-button"
+                    @click="mobileMenuOpen = true; $nextTick(() => { document.getElementById('mobile-menu-close').focus(); })"
+                    aria-controls="mobile-menu"
+                    :aria-expanded="mobileMenuOpen"
+                    aria-label="فتح القائمة"
+                >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
             </div>
         </div>
+
+        <!-- Mobile Off-Canvas Menu -->
+        <!-- Overlay -->
+        <div 
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition-opacity ease-linear duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-linear duration-300"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="mobileMenuOpen = false"
+            @keydown.escape.window="mobileMenuOpen = false"
+            class="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden"
+            style="display: none;"
+            aria-hidden="true"
+        ></div>
+
+        <!-- Sidebar Panel -->
+        <div 
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition ease-out duration-300 transform"
+            x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transition ease-in duration-300 transform"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="translate-x-full"
+            @keydown.escape.window="mobileMenuOpen = false"
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="قائمة الموقع"
+            class="fixed top-0 right-0 h-full w-72 sm:w-80 bg-white shadow-xl z-50 overflow-y-auto md:hidden"
+            style="display: none;"
+            x-ref="mobileMenu"
+        >
+            <!-- Close Button -->
+            <div class="flex justify-start items-center p-4 border-b border-gray-100">
+                <button 
+                    id="mobile-menu-close"
+                    @click="mobileMenuOpen = false"
+                    class="p-2 text-gray-600 hover:text-brand-accent transition-colors rounded-md hover:bg-gray-100"
+                    aria-label="إغلاق القائمة"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Navigation Items -->
+            <nav class="py-4" @click.away="mobileMenuOpen = false">
+                <div class="flex flex-col">
+                    <!-- المقالات (Articles) - Accordion -->
+                    <div class="border-b border-gray-100">
+                        <button 
+                            @click="articlesOpen = !articlesOpen"
+                            class="w-full flex items-center justify-between px-4 py-3 text-right text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-brand-accent transition-colors min-h-[3rem]"
+                            :aria-expanded="articlesOpen"
+                            aria-controls="articles-submenu"
+                        >
+                            <span>المقالات</span>
+                            <svg 
+                                class="w-5 h-5 transition-transform duration-200"
+                                :class="articlesOpen ? 'rotate-180' : ''"
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Articles Submenu -->
+                        <div 
+                            id="articles-submenu"
+                            x-show="articlesOpen"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 max-h-0"
+                            x-transition:enter-end="opacity-100 max-h-96"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 max-h-96"
+                            x-transition:leave-end="opacity-0 max-h-0"
+                            class="bg-gray-50 overflow-hidden"
+                            style="display: none;"
+                        >
+                            <a 
+                                href="{{ route('home') }}" 
+                                class="block px-4 py-3 pr-8 text-right text-sm text-gray-700 hover:bg-gray-100 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center {{ request()->routeIs('home') ? 'text-brand-accent font-medium bg-gray-100' : '' }}"
+                                @click="mobileMenuOpen = false"
+                            >
+                                المقالات الحديثة
+                            </a>
+                            <a 
+                                href="{{ route('posts.most-liked') }}" 
+                                class="block px-4 py-3 pr-8 text-right text-sm text-gray-700 hover:bg-gray-100 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center {{ request()->routeIs('posts.most-liked') ? 'text-brand-accent font-medium bg-gray-100' : '' }}"
+                                @click="mobileMenuOpen = false"
+                            >
+                                المقالات الأكثر إعجاباً
+                            </a>
+                            <a 
+                                href="{{ route('posts.most-read') }}" 
+                                class="block px-4 py-3 pr-8 text-right text-sm text-gray-700 hover:bg-gray-100 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center {{ request()->routeIs('posts.most-read') ? 'text-brand-accent font-medium bg-gray-100' : '' }}"
+                                @click="mobileMenuOpen = false"
+                            >
+                                المقالات الأكثر قراءة
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- عني (About) -->
+                    <a 
+                        href="{{ route('about') }}" 
+                        class="block px-4 py-3 text-right text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center border-b border-gray-100 {{ request()->routeIs('about') ? 'text-brand-accent bg-gray-50' : '' }}"
+                        @click="mobileMenuOpen = false"
+                    >
+                        عني
+                    </a>
+
+                    <!-- تواصل معي (Contact) -->
+                    <a 
+                        href="{{ route('contact') }}" 
+                        class="block px-4 py-3 text-right text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center border-b border-gray-100 {{ request()->routeIs('contact') ? 'text-brand-accent bg-gray-50' : '' }}"
+                        @click="mobileMenuOpen = false"
+                    >
+                        تواصل معي
+                    </a>
+
+                    <!-- Sidebar Widgets (Mobile Only) -->
+                    <div class="px-4 py-4 space-y-4 border-b border-gray-100">
+                        <!-- Search -->
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 class="text-base font-semibold mb-3 text-right">البحث</h4>
+                            <form action="{{ route('search') }}" method="GET" @click.stop>
+                                <input 
+                                    type="search" 
+                                    name="q" 
+                                    value="{{ request('q') }}"
+                                    placeholder="ابحث عن مقالات..." 
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                                />
+                            </form>
+                        </div>
+
+                        <!-- Categories -->
+                        @if(isset($categories) && $categories->count() > 0)
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                                <h4 class="text-base font-semibold mb-3 text-right">الأقسام</h4>
+                                <ul class="space-y-2 text-right">
+                                    @foreach($categories as $category)
+                                        <li>
+                                            <a 
+                                                href="{{ route('category.show', $category->slug) }}" 
+                                                class="flex justify-between items-center py-2 hover:text-brand-accent transition-colors"
+                                                @click="mobileMenuOpen = false"
+                                            >
+                                                <span class="text-sm text-gray-500">({{ $category->posts_count ?? 0 }})</span>
+                                                <span class="text-sm font-medium">{{ $category->name }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <!-- Latest Posts -->
+                        @if(isset($recentPosts) && $recentPosts->count() > 0)
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                                <h4 class="text-base font-semibold mb-3 text-right">أحدث المقالات</h4>
+                                <ul class="space-y-3 text-right">
+                                    @foreach($recentPosts as $recentPost)
+                                        <li>
+                                            <a 
+                                                href="{{ route('post.show', $recentPost->slug) }}" 
+                                                class="block group"
+                                                @click="mobileMenuOpen = false"
+                                            >
+                                                <div class="text-sm font-medium group-hover:text-brand-accent transition-colors mb-1">
+                                                    {{ Str::limit($recentPost->title, 60) }}
+                                                </div>
+                                                <div class="text-xs text-gray-400">
+                                                    {{ $recentPost->published_at->format('Y/m/d') }}
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Auth Links (Login only - Dashboard removed from mobile) -->
+                    @guest
+                        <div class="border-t border-gray-100">
+                            <a 
+                                href="{{ route('login') }}" 
+                                class="block px-4 py-3 text-right text-base font-medium text-gray-800 hover:bg-gray-50 hover:text-brand-accent transition-colors min-h-[3rem] flex items-center {{ request()->routeIs('login') ? 'text-brand-accent bg-gray-50' : '' }}"
+                                @click="mobileMenuOpen = false"
+                            >
+                                تسجيل الدخول
+                            </a>
+                        </div>
+                    @endguest
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white">
-        <div class="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <a href="{{ route('home') }}" class="text-sm font-medium text-gray-600">المقالات</a>
-            <a href="{{ route('about') }}" class="text-sm font-medium text-gray-600">عني</a>
-            <a href="{{ route('contact') }}" class="text-sm font-medium text-gray-600">تواصل معي</a>
-            
-            @auth
-                <div class="border-t border-gray-100 pt-4">
-                    <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-600">لوحة التحكم</a>
+    <!-- No-JS Fallback Menu (shows when JavaScript is disabled) -->
+    <noscript>
+        <div class="md:hidden border-t border-gray-200 bg-white">
+            <div class="container mx-auto px-4 py-4 flex flex-col space-y-4">
+                <details class="border-b border-gray-100 pb-4">
+                    <summary class="text-base font-medium text-gray-800 cursor-pointer list-none py-2">
+                        المقالات
+                    </summary>
+                    <div class="mt-2 pr-4 space-y-2">
+                        <a href="{{ route('home') }}" class="block text-sm text-gray-700 hover:text-brand-accent py-2">المقالات الحديثة</a>
+                        <a href="{{ route('posts.most-liked') }}" class="block text-sm text-gray-700 hover:text-brand-accent py-2">المقالات الأكثر إعجاباً</a>
+                        <a href="{{ route('posts.most-read') }}" class="block text-sm text-gray-700 hover:text-brand-accent py-2">المقالات الأكثر قراءة</a>
+                    </div>
+                </details>
+                <a href="{{ route('about') }}" class="text-base font-medium text-gray-800 hover:text-brand-accent py-2">عني</a>
+                <a href="{{ route('contact') }}" class="text-base font-medium text-gray-800 hover:text-brand-accent py-2">تواصل معي</a>
+                
+                <!-- Sidebar Widgets (No-JS Fallback) -->
+                <div class="space-y-4 pt-4 border-t border-gray-100">
+                    <!-- Search -->
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <h4 class="text-base font-semibold mb-3 text-right">البحث</h4>
+                        <form action="{{ route('search') }}" method="GET">
+                            <input 
+                                type="search" 
+                                name="q" 
+                                value="{{ request('q') }}"
+                                placeholder="ابحث عن مقالات..." 
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                            />
+                        </form>
+                    </div>
+
+                    <!-- Categories -->
+                    @if(isset($categories) && $categories->count() > 0)
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 class="text-base font-semibold mb-3 text-right">الأقسام</h4>
+                            <ul class="space-y-2 text-right">
+                                @foreach($categories as $category)
+                                    <li>
+                                        <a href="{{ route('category.show', $category->slug) }}" class="flex justify-between items-center py-2 hover:text-brand-accent transition-colors">
+                                            <span class="text-sm text-gray-500">({{ $category->posts_count ?? 0 }})</span>
+                                            <span class="text-sm font-medium">{{ $category->name }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <!-- Latest Posts -->
+                    @if(isset($recentPosts) && $recentPosts->count() > 0)
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 class="text-base font-semibold mb-3 text-right">أحدث المقالات</h4>
+                            <ul class="space-y-3 text-right">
+                                @foreach($recentPosts as $recentPost)
+                                    <li>
+                                        <a href="{{ route('post.show', $recentPost->slug) }}" class="block group">
+                                            <div class="text-sm font-medium group-hover:text-brand-accent transition-colors mb-1">
+                                                {{ Str::limit($recentPost->title, 60) }}
+                                            </div>
+                                            <div class="text-xs text-gray-400">
+                                                {{ $recentPost->published_at->format('Y/m/d') }}
+                                            </div>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 </div>
-            @else
-                <div class="border-t border-gray-100 pt-4">
-                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600">تسجيل الدخول</a>
-                </div>
-            @endauth
+
+                <!-- Login Link (Dashboard removed from mobile) -->
+                @guest
+                    <div class="border-t border-gray-100 pt-4">
+                        <a href="{{ route('login') }}" class="text-base font-medium text-gray-800 hover:text-brand-accent py-2">تسجيل الدخول</a>
+                    </div>
+                @endguest
+            </div>
         </div>
-    </div>
+    </noscript>
 
     <!-- Main Content -->
     <main class="flex-grow">
@@ -170,10 +446,38 @@
     </footer>
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+        // Focus trap for mobile menu - simplified approach
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            
+            if (mobileMenu) {
+                // Handle Tab key for focus trap
+                mobileMenu.addEventListener('keydown', function(e) {
+                    if (e.key !== 'Tab') return;
+                    
+                    const focusableElements = mobileMenu.querySelectorAll(
+                        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                    );
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    
+                    if (e.shiftKey) {
+                        // Shift + Tab
+                        if (document.activeElement === firstElement) {
+                            e.preventDefault();
+                            lastElement?.focus();
+                        }
+                    } else {
+                        // Tab
+                        if (document.activeElement === lastElement) {
+                            e.preventDefault();
+                            firstElement?.focus();
+                        }
+                    }
+                });
+            }
         });
 
         // Sidebar toggle

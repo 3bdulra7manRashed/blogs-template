@@ -28,7 +28,7 @@
 
 @section('content')
 <!-- Reading Progress Bar -->
-<div id="reading-progress-bar" class="fixed top-12 right-0 h-1.5 bg-amber-600 z-50 transition-all duration-100 ease-out" style="width: 0%;"></div>
+<div id="reading-progress-bar" class="fixed top-17 md:top-12 right-0 h-1.5 bg-brand-accent z-50 transition-all duration-100 ease-out" style="width: 0%;"></div>
 
 <article>
     <!-- Post Header -->
