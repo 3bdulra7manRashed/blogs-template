@@ -58,7 +58,7 @@
 
         @if($post->featured_image_url)
             <div class="mb-12">
-                <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?? $post->title }}" class="w-full h-[500px] object-cover rounded-lg shadow-sm">
+                <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?? $post->title }}" class="w-full aspect-video md:aspect-auto md:h-[500px] object-cover rounded-lg shadow-sm">
             </div>
         @endif
 
@@ -192,7 +192,7 @@
                         <article class="group text-right">
                             @if($relatedPost->featured_image_url)
                                 <a href="{{ route('post.show', $relatedPost->slug) }}" class="block mb-4 overflow-hidden rounded-lg">
-                                    <img src="{{ $relatedPost->featured_image_url }}" alt="{{ $relatedPost->title }}" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $relatedPost->featured_image_url }}" alt="{{ $relatedPost->title }}" class="w-full aspect-video md:aspect-auto md:h-56 object-cover transform group-hover:scale-105 transition-transform duration-500">
                                 </a>
                             @endif
                             <div class="mt-4">
