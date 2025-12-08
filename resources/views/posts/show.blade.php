@@ -63,7 +63,7 @@
         @endif
 
         <!-- Post Content -->
-        <div class="prose prose-lg max-w-none prose-headings:text-brand-accent prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-img:rounded-xl text-right">
+        <div class="prose prose-lg max-w-none prose-headings:text-brand-accent prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-img:rounded-xl prose-li:marker:text-brand-accent text-right">
             {!! $post->content !!}
         </div>
 
