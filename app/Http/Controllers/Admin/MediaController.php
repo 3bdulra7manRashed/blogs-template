@@ -37,9 +37,19 @@ class MediaController extends Controller
         Gate::authorize('create', Media::class);
 
         $validated = $request->validate([
-            'file' => ['required', 'image', 'max:5120'],
+            'file' => [
+                'required',
+                'file',
+                'mimes:jpeg,jpg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar',
+                'max:5120', // 5MB
+            ],
             'caption' => ['nullable', 'string', 'max:255'],
             'alt_text' => ['nullable', 'string', 'max:255'],
+        ], [
+            'file.required' => 'يجب اختيار ملف للرفع.',
+            'file.file' => 'الملف المرفوع غير صالح.',
+            'file.mimes' => 'نوع الملف غير مدعوم. الأنواع المدعومة: jpeg, jpg, png, gif, webp, pdf, doc, docx, xls, xlsx, ppt, pptx, zip, rar',
+            'file.max' => 'حجم الملف يجب ألا يتجاوز 5 ميجابايت.',
         ]);
 
         $file = $request->file('file');
@@ -85,41 +95,35 @@ class MediaController extends Controller
         return response()->json(['error' => 'فشل الرفع'], 400);
     }
 
-    public function destroy(Media $media)
-    {
-        Gate::authorize('delete', $media);
+    // لاحظ أننا غيرنا المستقبل من (Media $media) إلى ($id)
+public function destroy($id)
+{
+    // 1. البحث اليدوي عن الملف (شامل المحذوفات مؤقتاً لضمان العثور عليه)
+    $media = Media::withTrashed()->find($id);
 
-        // 1. استخراج اسم الملف بدقة (نفس اللوجيك الذي نجح سابقاً)
-        $pathInDb = $media->path;
-        $filename = pathinfo(parse_url($pathInDb, PHP_URL_PATH), PATHINFO_BASENAME);
-
-        if (empty($filename) || $filename == '.') {
-            $parts = explode('/', $pathInDb);
-            $filename = end($parts);
-        }
-
-        // 2. تحديد المسار الفيزيائي
-        // بما أنك تستخدم ويندوز، نستخدم DIRECTORY_SEPARATOR لضمان شكل المسار الصحيح
-        $targetPath = public_path("storage/media" . DIRECTORY_SEPARATOR . $filename);
-
-        // 3. محاولة حذف الملف (وضع "الصامت")
-        // نحاول الحذف، ولو فشل بسبب ويندوز، نتجاهل الخطأ ونكمل
-        if (file_exists($targetPath)) {
-            try {
-                // @ قبل الدالة تمنع ظهور التحذيرات في PHP
-                @unlink($targetPath);
-            } catch (\Exception $e) {
-                // نسجل الخطأ في اللوج فقط للمبرمج، ولا نعرضه للمستخدم
-                Log::warning("File delete failed (Windows Lock): " . $targetPath);
-            }
-        }
-
-        // 4. حذف السجل من قاعدة البيانات (يحدث دائماً)
-        $media->delete();
-
-        // 5. رسالة النجاح
+    // إذا لم يتم العثور على الملف، نرسل خطأ
+    if (!$media) {
         return redirect()->route('admin.media.index')
-            ->with('success', 'تم حذف الصورة بنجاح.');
+            ->with('error', 'الصورة غير موجودة أو تم حذفها بالفعل.');
     }
+
+    Gate::authorize('delete', $media);
+
+    // 2. حذف الملف الفيزيائي (كما في كودك السابق)
+    if ($media->path && Storage::disk('public')->exists($media->path)) {
+        try {
+            Storage::disk('public')->delete($media->path);
+        } catch (\Exception $e) {
+            Log::warning("فشل حذف الملف الفيزيائي: " . $e->getMessage());
+        }
+    }
+
+    // 3. الحذف النهائي من الداتا بيز
+    // نستخدم forceDelete لأنك جلبت الموديل، وهي تعمل سواء كان هناك SoftDeletes أم لا
+    $media->forceDelete();
+
+    return redirect()->route('admin.media.index')
+        ->with('success', 'تم حذف الصورة نهائياً.');
+}
 }
 

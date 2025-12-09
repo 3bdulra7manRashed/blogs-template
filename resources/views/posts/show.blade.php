@@ -2,6 +2,14 @@
 
 @section('title', $post->title . ' - ' . config('app.name'))
 
+@section('description', $post->excerpt ?? $post->meta['description'] ?? Str::limit(strip_tags($post->content), 160))
+
+@section('keywords', $post->meta['keywords'] ?? '')
+
+@section('og_type', 'article')
+
+@section('og_image', $post->featured_image_url ?? asset('images/default-share.jpg'))
+
 @push('styles')
 <style>
     /* Post Title Line Height for Better Multi-line Spacing */
@@ -16,15 +24,65 @@
 </style>
 @endpush
 
+{{-- Additional meta tags can still be added via @push('meta') if needed --}}
 @push('meta')
-<meta name="description" content="{{ $post->excerpt ?? $post->meta['description'] ?? '' }}">
-<meta property="og:title" content="{{ $post->title }}">
-<meta property="og:description" content="{{ $post->excerpt ?? $post->meta['description'] ?? '' }}">
-@if($post->featured_image_url)
-<meta property="og:image" content="{{ $post->featured_image_url }}">
+@if($post->published_at)
+<meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">
 @endif
-<meta property="og:type" content="article">
+@if($post->author)
+<meta property="article:author" content="{{ $post->author->name }}">
+@endif
+@if($post->categories->count() > 0)
+@foreach($post->categories as $category)
+<meta property="article:section" content="{{ $category->name }}">
+@endforeach
+@endif
+@if($post->tags->count() > 0)
+@foreach($post->tags as $tag)
+<meta property="article:tag" content="{{ $tag->name }}">
+@endforeach
+@endif
 @endpush
+
+{{-- Structured Data (Schema.org JSON-LD) for Article --}}
+@section('schema')
+@php
+    $schema = [
+        "@context" => "https://schema.org",
+        "@type" => "Article",
+        "headline" => $post->title,
+        // نستخدم دالة الهروب لضمان عدم وجود أكواد HTML تكسر الجيسون
+        "description" => $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160),
+        "datePublished" => $post->published_at?->toIso8601String() ?? $post->created_at->toIso8601String(),
+        "dateModified" => $post->updated_at->toIso8601String(),
+        "author" => [
+            "@type" => "Person",
+            "name" => $post->author->name
+        ],
+        "publisher" => [
+            "@type" => "Organization",
+            "name" => config('app.name', 'مدونة تجريبية'),
+            "logo" => [
+                "@type" => "ImageObject",
+                "url" => asset('images/default-share.jpg')
+            ]
+        ],
+        "mainEntityOfPage" => [
+            "@type" => "WebPage",
+            "@id" => url()->current()
+        ]
+    ];
+
+    // إضافة الصورة شرطياً بطريقة برمجية نظيفة
+    if ($post->featured_image_url) {
+        $schema['image'] = $post->featured_image_url;
+    }
+@endphp
+
+<script type="application/ld+json">
+    {!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+</script>
+@endsection
 
 @section('content')
 <!-- Reading Progress Bar -->

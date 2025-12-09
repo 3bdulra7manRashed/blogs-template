@@ -12,6 +12,27 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
+    /**
+     * Generate a slug that preserves Arabic characters
+     */
+    protected function generateArabicSlug(string $text): string
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', trim($text));
+        
+        // Remove illegal characters but KEEP Arabic letters, numbers, and dashes
+        // \p{L} matches any unicode letter (including Arabic)
+        // \p{N} matches any number
+        $slug = preg_replace('/[^\p{L}\p{N}\-]+/u', '', $slug);
+        
+        // Remove multiple dashes
+        $slug = preg_replace('/-+/', '-', $slug);
+        
+        // Trim dashes from start and end
+        $slug = trim($slug, '-');
+        
+        return $slug;
+    }
 
     public function index(): View
     {
@@ -49,7 +70,7 @@ class CategoryController extends Controller
             'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
-        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
+        $validated['slug'] = $validated['slug'] ?? $this->generateArabicSlug($validated['name']);
         $validated['order_column'] = $validated['order_column'] ?? Category::max('order_column') + 1;
 
         $category = Category::create($validated);
@@ -92,8 +113,10 @@ class CategoryController extends Controller
             'order_column.integer' => 'الترتيب يجب أن يكون رقماً صحيحاً',
         ]);
 
-        if (isset($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['slug']);
+        if (isset($validated['slug']) && !empty($validated['slug'])) {
+            $validated['slug'] = $this->generateArabicSlug($validated['slug']);
+        } elseif (empty($validated['slug'])) {
+            $validated['slug'] = $this->generateArabicSlug($validated['name']);
         }
 
         $category->update($validated);

@@ -244,6 +244,24 @@
                     slugInput.value = slug;
                 }
             });
+            
+            // Force generation on form submit (before sending to server)
+            const form = document.getElementById('post-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!slugInput.value.trim() && titleInput.value.trim()) {
+                        // Generate slug instantly before sending
+                        let slug = titleInput.value.trim()
+                            .replace(/\s+/g, '-')           // Replace spaces with -
+                            .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Keep Arabic & English chars & numbers
+                            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                            .replace(/^-+/, '')             // Trim - from start
+                            .replace(/-+$/, '');            // Trim - from end
+                        
+                        slugInput.value = slug;
+                    }
+                });
+            }
         }
     });
 </script>

@@ -15,10 +15,8 @@
     @method('PUT')
     
     <div class="flex flex-col lg:flex-row gap-6">
-        <!-- Main Column (Content) -->
         <div class="w-full lg:w-2/3 space-y-6">
             
-            <!-- Name & Slug -->
             <div class="bg-white p-6 rounded shadow">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">اسم الوسم</label>
@@ -45,7 +43,6 @@
                 </div>
             </div>
 
-            <!-- Tag Preview -->
             <div class="bg-white p-6 rounded shadow">
                 <h3 class="text-sm font-medium text-gray-700 mb-3">معاينة الوسم</h3>
                 <div class="flex items-center">
@@ -59,12 +56,11 @@
                 <p class="mt-2 text-xs text-gray-500">هكذا سيظهر الوسم في الموقع</p>
             </div>
 
-        </div>
+        </div> 
+        </form>
 
-        <!-- Sidebar Column (Settings) -->
         <div class="w-full lg:w-1/3 space-y-6">
             
-            <!-- Publishing Actions -->
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">الإجراءات</h3>
 
@@ -72,13 +68,12 @@
                     <a href="{{ route('admin.tags.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors text-sm font-medium">
                         إلغاء
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-brand-primary text-white rounded hover:bg-opacity-90 transition-colors text-sm font-medium shadow-sm">
+                    <button type="submit" form="tag-form" class="px-6 py-2 bg-brand-primary text-white rounded hover:bg-opacity-90 transition-colors text-sm font-medium shadow-sm">
                         تحديث الوسم
                     </button>
                 </div>
             </div>
 
-            <!-- Statistics -->
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-3 text-sm">إحصائيات</h3>
                 <div class="space-y-3">
@@ -93,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- Info Card -->
             <div class="bg-purple-50 border border-purple-200 p-4 rounded shadow-sm">
                 <div class="flex items-start">
                     <svg class="w-5 h-5 text-purple-600 ml-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -106,7 +100,6 @@
                 </div>
             </div>
 
-            <!-- Quick Tips -->
             <div class="bg-white p-4 rounded shadow">
                 <h3 class="font-bold text-gray-800 mb-3 text-sm">نصائح سريعة</h3>
                 <ul class="space-y-2 text-xs text-gray-600">
@@ -125,7 +118,6 @@
                 </ul>
             </div>
 
-            <!-- Danger Zone -->
             <div class="bg-red-50 border border-red-200 p-4 rounded shadow-sm">
                 <h3 class="font-bold text-red-800 mb-2 text-sm">منطقة الخطر</h3>
                 <p class="text-xs text-red-700 mb-3">حذف هذا الوسم سيزيله من جميع المقالات المرتبطة به.</p>
@@ -141,7 +133,7 @@
 
         </div>
     </div>
-</form>
+
 @endsection
 
 @push('scripts')
@@ -171,5 +163,23 @@
             slugInput.value = slug;
         }
     });
+    
+    // Force generation on form submit (before sending to server)
+    const form = document.getElementById('tag-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!slugInput.value.trim() && nameInput.value.trim()) {
+                // Generate slug instantly before sending
+                let slug = nameInput.value.trim()
+                    .replace(/\s+/g, '-')           // Replace spaces with -
+                    .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Keep Arabic & English chars & numbers
+                    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                    .replace(/^-+/, '')             // Trim - from start
+                    .replace(/-+$/, '');            // Trim - from end
+                
+                slugInput.value = slug;
+            }
+        });
+    }
 </script>
 @endpush

@@ -1,26 +1,79 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    {{-- Essential Meta Tags --}}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#c37c54">
 
-    <title>@yield('title', config('app.name', 'Writer Blog'))</title>
+    {{-- Primary Meta Tags --}}
+    <title>@yield('title', config('app.name', 'مدونة تجريبية'))</title>
+    <meta name="title" content="@yield('title', config('app.name', 'مدونة تجريبية'))">
+    <meta name="description" content="@yield('description', 'مدونة عربية متخصصة في المقالات والمواضيع المتنوعة. اكتشف أحدث المقالات والمحتوى المميز.')">
+    @hasSection('keywords')
+    <meta name="keywords" content="@yield('keywords')">
+    @endif
+    <meta name="author" content="@yield('author', config('app.name', 'مدونة تجريبية'))">
 
+    {{-- Canonical URL (Prevents Duplicate Content) --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph / Facebook / LinkedIn --}}
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', config('app.name', 'مدونة تجريبية'))">
+    <meta property="og:description" content="@yield('description', 'مدونة عربية متخصصة في المقالات والمواضيع المتنوعة. اكتشف أحدث المقالات والمحتوى المميز.')">
+    <meta property="og:image" content="@yield('og_image', asset('images/default-share.jpg'))">
+    <meta property="og:site_name" content="{{ config('app.name', 'مدونة تجريبية') }}">
+    <meta property="og:locale" content="ar_AR">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="@yield('title', config('app.name', 'مدونة تجريبية'))">
+    <meta name="twitter:description" content="@yield('description', 'مدونة عربية متخصصة في المقالات والمواضيع المتنوعة. اكتشف أحدث المقالات والمحتوى المميز.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/default-share.jpg'))">
+
+    {{-- Additional Meta Tags (Allow pages to override via @push('meta')) --}}
     @stack('meta')
 
-    <!-- Fonts -->
+    {{-- Favicon --}}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
+
+    {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Scripts -->
+    {{-- Scripts --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- Alpine.js -->
+    {{-- Alpine.js --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {{-- Structured Data (Schema.org JSON-LD) --}}
+    @yield('schema')
+
+    {{-- Google Analytics (GA4) - Uncomment and replace G-XXXXXXXXXX with your tracking ID --}}
+    {{--
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    --}}
 </head>
 <body class="font-sans antialiased bg-white text-brand-primary flex flex-col min-h-screen">
+    {{-- Skip to Content Link (Accessibility) --}}
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand-accent focus:text-white focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent">
+        التخطي إلى المحتوى الرئيسي
+    </a>
     <!-- Top Navigation Bar (Hidden on mobile, visible on desktop) -->
     <div class="hidden md:block border-b border-gray-100 bg-white sticky top-0 z-40">
         <div class="container mx-auto px-4 max-w-5xl">
@@ -423,7 +476,48 @@
     </noscript>
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main id="main-content" class="flex-grow">
+        {{-- Flash Messages Area --}}
+        @if(session('success'))
+            <div class="container mx-auto px-4 mt-6 max-w-5xl">
+                <div class="bg-green-50 border-r-4 border-green-500 text-green-700 p-4 rounded shadow-sm relative" role="alert" x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="font-medium">{{ session('success') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-green-700 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="container mx-auto px-4 mt-6 max-w-5xl">
+                <div class="bg-red-50 border-r-4 border-red-500 text-red-700 p-4 rounded shadow-sm relative" role="alert" x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="font-medium">{{ session('error') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-red-700 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @yield('content')
     </main>
 

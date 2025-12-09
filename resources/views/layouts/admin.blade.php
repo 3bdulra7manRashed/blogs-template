@@ -16,50 +16,20 @@
     @stack('styles')
 </head>
 <body class="bg-gray-100 font-sans">
-    {{-- Centralized modal flash (global) --}}
+    {{-- Plain password display (if needed) --}}
     @php
-        $success = session('success');
-        $error = session('error');
         $plainPassword = session()->pull('plain_password'); // consumed once
     @endphp
-
-    <div id="site-flash-modal" aria-hidden="true" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-        <!-- backdrop -->
-        <div id="site-flash-backdrop" class="absolute inset-0 bg-black/60"></div>
-
-        <!-- modal box -->
-        <div role="dialog" aria-modal="true" aria-labelledby="site-flash-title"
-             class="relative bg-white rounded-lg shadow-2xl max-w-lg w-[90%] md:w-1/2 p-8 text-center">
-            <button id="site-flash-close" aria-label="close"
-                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
-
-            <div id="site-flash-icon" class="mx-auto mb-4 w-24 h-24 flex items-center justify-center rounded-full bg-green-50">
-                <!-- icon will be replaced by JS -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    @if($plainPassword)
+        <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg shadow-sm" role="alert" x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                 </svg>
-            </div>
-
-            <h3 id="site-flash-title" class="text-2xl font-semibold text-gray-800 mb-2"></h3>
-
-            <p id="site-flash-message" class="text-gray-600 mb-4"></p>
-
-            <div id="site-flash-extra" class="text-gray-800 font-semibold mb-4"></div>
-
-            <div class="flex justify-center">
-                <button id="site-flash-ok" class="px-6 py-2 rounded bg-sky-300 hover:bg-sky-400 text-white">حسناً</button>
+                <p class="font-medium">كلمة المرور هي: <strong>{{ $plainPassword }}</strong> (تظهر مرة واحدة فقط)</p>
             </div>
         </div>
-    </div>
-
-    <!-- inject PHP variables into JS -->
-    <script>
-        window._siteFlash = {
-            success: {!! json_encode($success ?? null) !!},
-            error: {!! json_encode($error ?? null) !!},
-            plainPassword: {!! json_encode($plainPassword ?? null) !!}
-        };
-    </script>
+    @endif
 
     {{-- Global confirmation modal (centralized) --}}
     <div id="site-confirm-modal" aria-hidden="true" class="hidden fixed inset-0 z-[60] flex items-center justify-center">
@@ -190,7 +160,39 @@
         <!-- Main Content -->
         <main class="flex-1 w-full md:mr-64 overflow-auto">
             <div class="p-4 md:p-8">
-                {{-- flash alerts centralized to layouts.admin (modal) --}}
+                {{-- Flash Alert (Success/Error) - Auto-dismissing --}}
+                @if(session('success'))
+                    <div id="flash-alert" class="mb-4 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm flex items-center justify-between" role="alert" x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="font-medium">{{ session('success') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-green-700 hover:text-green-900 ml-4">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div id="flash-alert-error" class="mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm flex items-center justify-between" role="alert" x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="font-medium">{{ session('error') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-red-700 hover:text-red-900 ml-4">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+
                 @yield('content')
             </div>
         </main>
@@ -198,23 +200,24 @@
     
     @stack('scripts')
     
-    <!-- Mobile Menu Toggle Script -->
     <script>
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         
         function toggleSidebar() {
-            sidebar.classList.toggle('translate-x-full');
-            backdrop.classList.toggle('hidden');
-            document.body.classList.toggle('overflow-hidden');
+            if (sidebar && backdrop) {
+                sidebar.classList.toggle('translate-x-full');
+                backdrop.classList.toggle('hidden');
+                document.body.classList.toggle('overflow-hidden');
+            }
         }
         
         mobileMenuBtn?.addEventListener('click', toggleSidebar);
         backdrop?.addEventListener('click', toggleSidebar);
         
         // Close sidebar when clicking a link on mobile
-        if (window.innerWidth < 768) {
+        if (window.innerWidth < 768 && sidebar) {
             const sidebarLinks = sidebar.querySelectorAll('a, button[type="submit"]');
             sidebarLinks.forEach(link => {
                 link.addEventListener('click', () => {
@@ -226,92 +229,57 @@
         }
     </script>
 
-    <!-- Global Flash Modal Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const payload = window._siteFlash || {};
-            const success = payload.success || null;
-            const error = payload.error || null;
-            const plainPassword = payload.plainPassword || null;
-
-            const modal = document.getElementById('site-flash-modal');
-            if (!modal) return;
-
-            const backdrop = document.getElementById('site-flash-backdrop');
-            const closeBtn = document.getElementById('site-flash-close');
-            const okBtn = document.getElementById('site-flash-ok');
-            const titleEl = document.getElementById('site-flash-title');
-            const msgEl = document.getElementById('site-flash-message');
-            const extraEl = document.getElementById('site-flash-extra');
-            const iconEl = document.getElementById('site-flash-icon');
-
-            function showModal(type, message, extraHtml = '') {
-                if (type === 'success') {
-                    titleEl.textContent = 'تم بنجاح !';
-                    iconEl.className = 'mx-auto mb-4 w-24 h-24 flex items-center justify-center rounded-full bg-green-50';
-                    iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>`;
-                } else {
-                    titleEl.textContent = 'حدث خطأ';
-                    iconEl.className = 'mx-auto mb-4 w-24 h-24 flex items-center justify-center rounded-full bg-red-50';
-                    iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>`;
-                }
-
-                // Safely render HTML and convert newlines to <br>
-                if (message) {
-                    // Convert newline characters to <br> tags
-                    const safeHtml = String(message)
-                        .replace(/\r\n/g, '\n')
-                        .replace(/\r/g, '\n')
-                        .replace(/\n/g, '<br>');
-                    msgEl.innerHTML = safeHtml;
-                } else {
-                    msgEl.innerHTML = '';
-                }
-                extraEl.innerHTML = extraHtml || '';
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
-                // focus OK button for accessibility
-                okBtn.focus();
+            const successAlert = document.getElementById('flash-alert');
+            const errorAlert = document.getElementById('flash-alert-error');
+            
+            function autoDismiss(alert) {
+                if (!alert) return;
+                setTimeout(() => {
+                    if (window.Alpine && alert.hasAttribute('x-data')) {
+                        Alpine.$data(alert).show = false;
+                        setTimeout(() => alert.remove(), 300);
+                    } else {
+                        alert.style.transition = 'opacity 0.3s ease-in';
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 300);
+                    }
+                }, 4000);
             }
-
-            function hideModal() {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
-            }
-
-            backdrop.addEventListener('click', hideModal);
-            closeBtn.addEventListener('click', hideModal);
-            okBtn.addEventListener('click', hideModal);
-            document.addEventListener('keydown', function(e){
-                if (e.key === 'Escape') hideModal();
-            });
-
-            if (success) {
-                const extra = plainPassword ? `— كلمة المرور هي: <strong>${plainPassword}</strong> (تظهر مرة واحدة فقط)` : '';
-                showModal('success', success, extra);
-            } else if (error) {
-                showModal('error', error);
+            
+            if (window.Alpine) {
+                autoDismiss(successAlert);
+                autoDismiss(errorAlert);
+            } else {
+                document.addEventListener('alpine:init', () => {
+                    autoDismiss(successAlert);
+                    autoDismiss(errorAlert);
+                });
+                setTimeout(() => {
+                    autoDismiss(successAlert);
+                    autoDismiss(errorAlert);
+                }, 100);
             }
         });
     </script>
 
-    <!-- Global Confirmation Modal Script -->
     <script>
+        // Define these globally so they can be used anywhere
+        window.showConfirmModal = null;
+        window.confirmDelete = null;
+
         document.addEventListener('DOMContentLoaded', function () {
             const confirmModal = document.getElementById('site-confirm-modal');
             if (!confirmModal) return;
 
-            const backdrop = document.getElementById('site-confirm-backdrop');
+            const modalBackdrop = document.getElementById('site-confirm-backdrop');
             const closeBtn = document.getElementById('site-confirm-close');
             const cancelBtn = document.getElementById('site-confirm-cancel');
             const okBtn = document.getElementById('site-confirm-ok');
-            const titleEl = document.getElementById('site-confirm-title');
             const msgEl = document.getElementById('site-confirm-message');
+            
+            // Input elements for "Type to confirm" (optional usage)
             const inputWrapper = document.getElementById('site-confirm-input-wrapper');
             const inputEl = document.getElementById('site-confirm-input');
             const helpEl = document.getElementById('site-confirm-help');
@@ -319,122 +287,85 @@
 
             let currentForm = null;
             let expectedInput = null;
-            let inputPlaceholder = null;
 
-            // Utility: escape HTML for user-provided fragments
-            function escapeHtml(str) {
-                return String(str)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;');
-            }
-
-            // Main: prepare and set modal message
-            function prepareAndSetModalMessage(rawMessage) {
-                if (!rawMessage) {
-                    msgEl.innerHTML = '';
-                    return;
-                }
-
-                // 1) Normalize line breaks
-                let msg = String(rawMessage).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-                // 2) Insert a newline after the FIRST Arabic question mark (؟) or Latin '?'
-                //    This converts: "هل أنت متأكد؟ سيتم نقل..."  ->  "هل أنت متأكد؟\nسيتم نقل..."
-                //    Handles both Arabic (U+061F) and Latin question marks
-                msg = msg.replace(/[\u061F?](\s*)/, function(match) {
-                    // Return the question mark followed by newline (trim trailing spaces)
-                    return match.trim().slice(0, 1) + '\n';
-                });
-
-                // 3) Convert newlines to <br> for display
-                //    We will escape everything first except the <br> that we insert, to avoid XSS.
-                //    Split on '\n', escape each piece, then join with <br>.
-                const parts = msg.split('\n');
-                const escapedParts = parts.map(p => escapeHtml(p));
-                const safeHtml = escapedParts.join('<br>');
-
-                msgEl.innerHTML = safeHtml;
-            }
-
-            function showConfirmModal(message, form, expectedText = null, placeholder = null, okText = 'تأكيد') {
+            // 1. Show Modal Function
+            window.showConfirmModal = function(message, form, expectedText = null, placeholder = null, okText = 'تأكيد') {
                 currentForm = form;
                 expectedInput = expectedText;
-                inputPlaceholder = placeholder || 'اكتب كلمة التأكيد هنا';
+                
+                // Format message (handle newlines)
+                if(msgEl) msgEl.innerHTML = message.replace(/\n/g, '<br>');
+                if(okBtn) okBtn.textContent = okText;
 
-                prepareAndSetModalMessage(message || 'هل أنت متأكد؟');
-                okBtn.textContent = okText;
-
-                if (expectedText) {
+                // Handle text input confirmation if needed
+                if (expectedText && inputWrapper) {
                     inputWrapper.classList.remove('hidden');
                     inputEl.value = '';
-                    inputEl.placeholder = inputPlaceholder;
-                    if (helpEl) {
-                        helpEl.innerHTML = `اكتب <strong>${expectedText}</strong> للتأكيد`;
-                    }
-                    errorEl.classList.add('hidden');
-                    inputEl.focus();
-                } else {
+                    inputEl.placeholder = placeholder || 'اكتب كلمة التأكيد';
+                    if (helpEl) helpEl.innerHTML = `اكتب <strong>${expectedText}</strong> للتأكيد`;
+                    if (errorEl) errorEl.classList.add('hidden');
+                } else if (inputWrapper) {
                     inputWrapper.classList.add('hidden');
-                    okBtn.focus();
                 }
 
                 confirmModal.classList.remove('hidden');
                 confirmModal.classList.add('flex');
-                confirmModal.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
-            }
+            };
 
+            // 2. Hide Modal Function
             function hideConfirmModal() {
                 confirmModal.classList.add('hidden');
                 confirmModal.classList.remove('flex');
-                confirmModal.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
                 currentForm = null;
                 expectedInput = null;
-                inputEl.value = '';
-                errorEl.classList.add('hidden');
+                if (inputEl) inputEl.value = '';
             }
 
+            // 3. Handle Confirmation Click
             function handleConfirm() {
-                if (expectedInput) {
-                    const inputValue = inputEl.value.trim();
-                    if (inputValue !== expectedInput) {
-                        errorEl.textContent = `لم يتم التأكيد. اكتب "${expectedInput}" لتنفيذ الإجراء.`;
-                        errorEl.classList.remove('hidden');
-                        inputEl.focus();
+                // Verification logic
+                if (expectedInput && inputEl) {
+                    if (inputEl.value.trim() !== expectedInput) {
+                        if (errorEl) {
+                            errorEl.textContent = `لم يتم التأكيد بشكل صحيح.`;
+                            errorEl.classList.remove('hidden');
+                        }
                         return;
                     }
                 }
 
+                // SUBMIT THE FORM
                 if (currentForm) {
+                    // We use submit() method which bypasses onsubmit handler to avoid infinite loop
                     currentForm.submit();
-                } else {
-                    console.warn('No form found for confirmation action');
                 }
                 hideConfirmModal();
             }
 
-            // Event listeners
-            backdrop.addEventListener('click', hideConfirmModal);
-            closeBtn.addEventListener('click', hideConfirmModal);
-            cancelBtn.addEventListener('click', hideConfirmModal);
-            okBtn.addEventListener('click', handleConfirm);
-            inputEl.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleConfirm();
-                }
-            });
+            // 4. Global Helper specifically for Delete Forms (onsubmit="return confirmDelete(...)")
+            window.confirmDelete = function(form, message = 'هل أنت متأكد من حذف هذا العنصر نهائياً؟') {
+                // Open the modal
+                window.showConfirmModal(message, form, null, null, 'حذف');
+                
+                // RETURN FALSE to stop the form from submitting immediately
+                // The form will be submitted programmatically inside handleConfirm()
+                return false;
+            };
+
+            // Event Listeners
+            modalBackdrop?.addEventListener('click', hideConfirmModal);
+            closeBtn?.addEventListener('click', hideConfirmModal);
+            cancelBtn?.addEventListener('click', hideConfirmModal);
+            okBtn?.addEventListener('click', handleConfirm);
+            
+            // Allow Escape key to close
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && !confirmModal.classList.contains('hidden')) {
                     hideConfirmModal();
                 }
             });
 
-            // Delegate clicks to .js-confirm buttons
+            // Delegate clicks to .js-confirm buttons (for edit pages)
             document.addEventListener('click', function(e) {
                 const confirmBtn = e.target.closest('.js-confirm');
                 if (!confirmBtn) return;
@@ -453,7 +384,7 @@
                 const placeholder = confirmBtn.getAttribute('data-confirm-input-placeholder') || null;
                 const okText = confirmBtn.getAttribute('data-confirm-ok-text') || 'تأكيد';
 
-                showConfirmModal(message, form, expectedInput, placeholder, okText);
+                window.showConfirmModal(message, form, expectedInput, placeholder, okText);
             });
         });
     </script>

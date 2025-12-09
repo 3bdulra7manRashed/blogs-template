@@ -13,13 +13,19 @@ use Illuminate\Support\Str;
     
     <form action="{{ route('admin.media.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         @csrf
-        <input type="file" name="file" accept="image/*" required 
-               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none 
-                      file:mr-0 file:py-2 file:px-4 
-                      file:rounded-lg file:border-0 
-                      file:text-sm file:font-semibold 
-                      file:bg-brand-accent file:text-white 
-                      hover:file:bg-amber-700 file:cursor-pointer">
+        <div class="flex-1">
+            <input type="file" name="file" accept=".jpeg,.jpg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar" required 
+                   class="block w-full text-sm text-gray-900 border rounded-lg cursor-pointer bg-gray-50 focus:outline-none 
+                          {{ $errors->has('file') ? 'border-red-500' : 'border-gray-300' }}
+                          file:mr-0 file:py-2 file:px-4 
+                          file:rounded-lg file:border-0 
+                          file:text-sm file:font-semibold 
+                          file:bg-brand-accent file:text-white 
+                          hover:file:bg-amber-700 file:cursor-pointer">
+            @error('file')
+                <p class="text-red-500 text-sm mt-1" role="alert">{{ $message }}</p>
+            @enderror
+        </div>
         <button type="submit" class="flex items-center justify-center px-4 py-2 bg-brand-accent text-white rounded-lg hover:bg-amber-700 transition-colors shadow-sm hover:shadow-md whitespace-nowrap">
             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -80,10 +86,10 @@ use Illuminate\Support\Str;
                         <span class="btn-text">نسخ</span>
                     </button>
 
-                    <form action="{{ route('admin.media.destroy', $item) }}" method="POST" class="inline-block" onsubmit="return confirm('هل أنت متأكد من حذف هذا الملف نهائياً؟');">
+                    <form id="delete-form-{{ $item->id }}" action="{{ route('admin.media.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete(this, 'هل أنت متأكد من حذف هذا الملف نهائياً؟');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="p-1.5 text-red-500 hover:text-white hover:bg-red-500 rounded border border-red-100 hover:border-red-500 transition-colors shadow-sm" title="حذف الملف">
+                        <button type="submit" class="p-1.5 text-red-600 hover:text-white hover:bg-red-500 rounded border border-red-100 hover:border-red-500 transition-colors shadow-sm" title="حذف الملف">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>

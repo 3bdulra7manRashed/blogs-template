@@ -12,6 +12,27 @@ use Illuminate\View\View;
 
 class TagController extends Controller
 {
+    /**
+     * Generate a slug that preserves Arabic characters
+     */
+    protected function generateArabicSlug(string $text): string
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', trim($text));
+        
+        // Remove illegal characters but KEEP Arabic letters, numbers, and dashes
+        // \p{L} matches any unicode letter (including Arabic)
+        // \p{N} matches any number
+        $slug = preg_replace('/[^\p{L}\p{N}\-]+/u', '', $slug);
+        
+        // Remove multiple dashes
+        $slug = preg_replace('/-+/', '-', $slug);
+        
+        // Trim dashes from start and end
+        $slug = trim($slug, '-');
+        
+        return $slug;
+    }
 
     public function index(): View
     {
@@ -46,7 +67,7 @@ class TagController extends Controller
             'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
         ]);
 
-        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
+        $validated['slug'] = $validated['slug'] ?? $this->generateArabicSlug($validated['name']);
 
         $tag = Tag::create($validated);
 
@@ -85,8 +106,10 @@ class TagController extends Controller
             'slug.unique' => 'الرابط الدائم مستخدم مسبقاً',
         ]);
 
-        if (isset($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['slug']);
+        if (isset($validated['slug']) && !empty($validated['slug'])) {
+            $validated['slug'] = $this->generateArabicSlug($validated['slug']);
+        } elseif (empty($validated['slug'])) {
+            $validated['slug'] = $this->generateArabicSlug($validated['name']);
         }
 
         $tag->update($validated);

@@ -41,7 +41,7 @@ use Illuminate\Support\Str;
                 <tr>
                     <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">العنوان</th>
                     <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">الكاتب</th>
-                    <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
+                    <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">الحالة</th>
                     <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">تاريخ النشر</th>
                     <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
                 </tr>
@@ -49,16 +49,37 @@ use Illuminate\Support\Str;
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($posts as $post)
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 md:px-6 py-4 text-center min-w-[200px]">
-                            <a href="{{ route('post.show', $post->slug) }}" target="_blank" class="text-sm font-medium text-gray-900 hover:text-brand-accent transition-colors line-clamp-2 block">
-                                {{ $post->title }}
-                            </a>
-                            <div class="md:hidden text-xs text-gray-500 mt-1">{{ $post->author->name }}</div>
+                        <td class="px-4 md:px-6 py-4 min-w-[200px]">
+                            <!-- Mobile: Vertical Stack (flex-col, centered) -->
+                            <div class="flex flex-col items-center text-center gap-y-2 md:block md:text-center">
+                                <!-- Post Title -->
+                                <a href="{{ route('post.show', $post->slug) }}" target="_blank" class="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors line-clamp-2">
+                                    {{ $post->title }}
+                                </a>
+                                <!-- Author Name (Mobile only) -->
+                                <div class="text-sm text-gray-900 md:hidden">{{ $post->author->name }}</div>
+                                <!-- Status Badge (Mobile only) -->
+                                <div class="md:hidden">
+                                    @if($post->is_draft)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            مسودة
+                                        </span>
+                                    @elseif($post->isPublished())
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            منشور
+                                        </span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            مجدول
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
                         </td>
                         <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center hidden md:table-cell">
                             {{ $post->author->name }}
                         </td>
-                        <td class="px-4 md:px-6 py-4 whitespace-nowrap text-center">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap text-center hidden md:table-cell">
                             @if($post->is_draft)
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     مسودة

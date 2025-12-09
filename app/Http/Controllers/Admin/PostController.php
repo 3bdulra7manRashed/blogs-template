@@ -138,6 +138,9 @@ class PostController extends Controller
 
         if (isset($data['slug']) && !empty($data['slug'])) {
             $data['slug'] = $this->generateArabicSlug($data['slug']);
+        } elseif (empty($data['slug'] ?? '')) {
+            // If slug is empty, generate from title
+            $data['slug'] = $this->generateArabicSlug($data['title']);
         }
 
         // Auto-publish if published_at is set and not explicitly marked as draft

@@ -245,22 +245,39 @@
     const titleInput = document.getElementById('title');
     const slugInput = document.getElementById('slug');
     
-        if (titleInput && slugInput) {
-    titleInput.addEventListener('blur', function() {
-        // Only generate if slug is empty
-        if (slugInput.value.trim() === '') {
-            const title = this.value;
-            const slug = title.trim()
-                .replace(/\s+/g, '-')           // Replace spaces with -
-                .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Remove non-word chars (preserving Arabic & -)
-                .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-                .replace(/^-+/, '')             // Trim - from start
-                .replace(/-+$/, '');            // Trim - from end
-            
-            slugInput.value = slug;
+    if (titleInput && slugInput) {
+        titleInput.addEventListener('blur', function() {
+            // Only generate if slug is empty
+            if (slugInput.value.trim() === '') {
+                const title = this.value;
+                const slug = title.trim()
+                    .replace(/\s+/g, '-')           // Replace spaces with -
+                    .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Remove non-word chars (preserving Arabic & -)
+                    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                    .replace(/^-+/, '')             // Trim - from start
+                    .replace(/-+$/, '');            // Trim - from end
+                
+                slugInput.value = slug;
+            }
+        });
+        
+        // Force generation on form submit (before sending to server)
+        const form = document.getElementById('post-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!slugInput.value.trim() && titleInput.value.trim()) {
+                    // Generate slug instantly before sending
+                    let slug = titleInput.value.trim()
+                        .replace(/\s+/g, '-')           // Replace spaces with -
+                        .replace(/[^\w\u0600-\u06FF\-]+/g, '') // Keep Arabic & English chars & numbers
+                        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                        .replace(/^-+/, '')             // Trim - from start
+                        .replace(/-+$/, '');            // Trim - from end
+                    
+                    slugInput.value = slug;
                 }
             });
         }
-    });
+    }
 </script>
 @endpush

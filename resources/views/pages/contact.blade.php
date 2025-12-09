@@ -94,7 +94,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="pt-4 text-left">
+                    <div class="pt-4 text-right">
                         <button type="submit" class="submit-btn inline-flex items-center justify-center px-8 py-3.5 text-white font-bold rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent" style="background-color: #c37c54;">
                             <span>إرسال الرسالة</span>
                             <svg class="w-5 h-5 mr-2 -ml-1 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>

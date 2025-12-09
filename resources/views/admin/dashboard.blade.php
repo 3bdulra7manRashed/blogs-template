@@ -149,23 +149,41 @@
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">العنوان</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الكاتب</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التاريخ</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">العنوان</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">الكاتب</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">الحالة</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">التاريخ</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($recentPosts as $post)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-brand-primary">{{ $post->title }}</div>
+                                <!-- Mobile: Vertical Stack (flex-col, centered) -->
+                                <div class="flex flex-col items-center text-center gap-y-2 md:block md:text-center">
+                                    <!-- Post Title -->
+                                    <div class="text-sm font-medium text-brand-primary">{{ $post->title }}</div>
+                                    <!-- Author Name (Mobile only) -->
+                                    <div class="text-sm text-gray-900 md:hidden">{{ $post->author->name }}</div>
+                                    <!-- Status Badge (Mobile only) -->
+                                    <div class="md:hidden">
+                                        @if($post->is_draft)
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                مسودة
+                                            </span>
+                                        @else
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                منشور
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 hidden md:table-cell text-center">
                                 <div class="text-sm text-gray-900">{{ $post->author->name }}</div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 hidden md:table-cell text-center">
                                 @if($post->is_draft)
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                                         مسودة
@@ -176,11 +194,11 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
+                            <td class="px-6 py-4 text-sm text-gray-500 hidden md:table-cell text-center">
                                 {{ $post->created_at->diffForHumans() }}
                             </td>
-                            <td class="px-6 py-4 text-sm font-medium">
-                                <div class="flex items-center gap-2 justify-start">
+                            <td class="px-6 py-4 text-sm font-medium text-center">
+                                <div class="flex items-center gap-2 justify-center">
                                     <a href="{{ route('post.show', $post->slug) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-md hover:bg-green-100 hover:text-green-800 font-medium text-xs transition-colors duration-200">
                                         <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
