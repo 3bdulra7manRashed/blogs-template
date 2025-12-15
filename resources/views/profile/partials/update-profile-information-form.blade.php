@@ -1,5 +1,5 @@
 <section>
-    <header>
+    <header class="mb-6">
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('معلومات الملف الشخصي') }}
         </h2>
@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" id="profile-form">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-6" id="profile-form">
         @csrf
         @method('patch')
 
@@ -64,7 +64,9 @@
             @php
                 $value = old('biography', $user->biography);
             @endphp
-            @ckeditor('biography')
+            <div class="min-h-[300px] md:min-h-[400px]">
+                @ckeditor('biography')
+            </div>
             <x-input-error class="mt-2" :messages="$errors->get('biography')" />
         </div>
         @endif

@@ -4,7 +4,7 @@
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
                 <!-- Profile Link -->
-                <a href="{{ route('profile.edit') }}" class="text-xl font-bold text-gray-800 hover:text-gray-900">
+                <a href="{{ route('profile.edit') }}" class="text-xl font-bold text-brand-accent tracking-tight">
                     الملف الشخصي
                 </a>
             </div>

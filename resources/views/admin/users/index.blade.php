@@ -5,8 +5,8 @@
 @section('content')
 <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <h1 class="text-3xl font-serif font-bold text-brand-primary">المستخدمين</h1>
+    
     <div class="flex items-center gap-3">
-        <!-- Status Filter -->
         <div class="flex items-center gap-2 bg-white rounded-md shadow-sm p-1">
             <a href="{{ route('admin.users.index', ['status' => 'active']) }}" 
                class="px-3 py-1 text-xs rounded {{ request('status') === 'active' ? 'bg-brand-accent text-white' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -21,12 +21,15 @@
                 الكل
             </a>
         </div>
-    <a href="{{ route('admin.users.create') }}" class="px-4 py-2 bg-brand-accent text-white hover:bg-amber-700 hover:text-white rounded-md hover:bg-opacity-90 transition-colors">
-        إضافة مستخدم جديد
-    </a>
-</div>
-    </div>
 
+        <a href="{{ route('admin.users.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-accent text-white hover:bg-amber-700 hover:text-white rounded-md hover:bg-opacity-90 transition-colors">
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>مستخدم جديد</span>
+        </a>
+    </div>
+</div>
 {{-- flash alerts moved to layouts.admin --}}
 
 <!-- Users Table -->
