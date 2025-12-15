@@ -27,7 +27,7 @@
                     <x-slot name="content">
                         @can('viewAny', \App\Models\Post::class)
                         <x-dropdown-link :href="route('admin.dashboard')">
-                            {{ __('Admin Panel') }}
+                            {{ __('nav.admin_panel') }}
                         </x-dropdown-link>
                         @endcan
 
@@ -38,7 +38,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('nav.logout') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -68,12 +68,12 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('nav.profile') }}
                 </x-responsive-nav-link>
 
                 @can('viewAny', \App\Models\Post::class)
                 <x-responsive-nav-link :href="route('admin.dashboard')">
-                    {{ __('Admin Panel') }}
+                    {{ __('nav.admin_panel') }}
                 </x-responsive-nav-link>
                 @endcan
 
@@ -84,7 +84,7 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('nav.logout') }}
                     </x-responsive-nav-link>
                 </form>
             </div>
