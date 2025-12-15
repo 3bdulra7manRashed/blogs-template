@@ -316,7 +316,7 @@
                     <!-- Sidebar Widgets (Mobile Only) -->
                     <div class="px-4 py-4 space-y-4 border-b border-gray-100">
                         <!-- Search -->
-                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <div class="bg-brand-secondary p-6 rounded-lg">
                             <h4 class="text-base font-semibold mb-3 text-right">البحث</h4>
                             <form action="{{ route('search') }}" method="GET" @click.stop>
                                 <input 
@@ -331,7 +331,7 @@
 
                         <!-- Categories -->
                         @if(isset($categories) && $categories->count() > 0)
-                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <div class="bg-brand-secondary p-6 rounded-lg">
                                 <h4 class="text-base font-semibold mb-3 text-right">الأقسام</h4>
                                 <ul class="space-y-2 text-right">
                                     @foreach($categories as $category)
@@ -352,7 +352,7 @@
 
                         <!-- Latest Posts -->
                         @if(isset($recentPosts) && $recentPosts->count() > 0)
-                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <div class="bg-brand-secondary p-6 rounded-lg">
                                 <h4 class="text-base font-semibold mb-3 text-right">أحدث المقالات</h4>
                                 <ul class="space-y-3 text-right">
                                     @foreach($recentPosts as $recentPost)
