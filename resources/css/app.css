@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --writer-primary: #1f1f1f;
+    --writer-secondary: #f5f0ea;
+    --writer-accent: #c37c54;
+    --writer-muted: #6f6f6f;
+    --writer-body: #ffffff;
+}
+
+@layer base {
+    html {
+        font-family: "Writer Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+        @apply bg-white text-brand-primary antialiased;
+        background-color: var(--writer-body);
+    }
+
+    /* Custom text selection styles */
+    body ::selection {
+        background-color: var(--writer-accent);
+        color: #ffffff;
+    }
+
+    body ::-moz-selection {
+        background-color: var(--writer-accent);
+        color: #ffffff;
+    }
+
+    a {
+        @apply text-brand-accent transition-colors duration-150;
+    }
+
+    a:hover {
+        color: color-mix(in srgb, var(--writer-accent) 90%, #000000);
+    }
+}
+
+@layer utilities {
+    .prose-writer {
+        @apply max-w-prose leading-relaxed text-base;
+    }
+
+    .prose-writer p {
+        @apply mb-4;
+    }
+
+    .prose-writer ul {
+        @apply list-disc pr-6 mb-4 space-y-2;
+    }
+
+    .prose-writer ol {
+        @apply list-decimal pr-6 mb-4 space-y-2;
+    }
+
+    .prose-writer li {
+        @apply leading-7 text-brand-primary;
+    }
+
+    .prose-writer blockquote {
+        @apply border-r-4 border-brand-accent pr-4 my-6 text-lg italic text-gray-600 bg-brand-secondary bg-opacity-20 rounded-lg py-4;
+    }
+
+    .prose-writer img {
+        @apply max-w-full rounded-2xl my-6 shadow-sm;
+    }
+
+    .prose-writer figure {
+        @apply my-6;
+    }
+
+    .prose-writer figure.media,
+    .prose-writer iframe,
+    .prose-writer video {
+        width: 100%;
+        min-height: 320px;
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        background-color: #000;
+    }
+
+    .prose-writer figure.media iframe,
+    .prose-writer iframe,
+    .prose-writer video {
+        width: 100%;
+        height: 100%;
+    }
+
+    .prose-writer figure.table {
+        @apply my-6;
+    }
+
+    .prose-writer table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border-radius: 0.75rem;
+    }
+
+    .prose-writer table th {
+        @apply text-brand-primary font-semibold text-sm;
+        background-color: rgba(245, 240, 234, 0.4);
+    }
+
+    .prose-writer table th,
+    .prose-writer table td {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 0.85rem 1rem;
+        text-align: right;
+    }
+
+    .prose-writer table tr:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.015);
+    }
+}

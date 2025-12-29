@@ -1,0 +1,73 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-laravel-blog}-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      # Use named volumes so permissions from the image (user "unit") are preserved
+      - storage:/var/www/html/storage
+      - bootstrap_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Coolify magic variables (auto-provided by Coolify)
+      - SERVICE_FQDN_APP
+      - SERVICE_PASSWORD_MYSQLROOT
+      # Laravel core configuration
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_KEY=${APP_KEY:-}
+      - APP_NAME=${APP_NAME:-Laravel}
+      - APP_URL=https://${SERVICE_FQDN_APP}
+      - APP_MAINTENANCE_DRIVER=${APP_MAINTENANCE_DRIVER:-file}
+      # Database configuration
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-laravel}
+      - DB_USERNAME=${DB_USERNAME:-laravel}
+      - DB_PASSWORD=${SERVICE_PASSWORD_MYSQLROOT}
+      # Cache & Session
+      - CACHE_STORE=${CACHE_STORE:-file}
+      - SESSION_DRIVER=${SESSION_DRIVER:-file}
+      - FILESYSTEM_DISK=${FILESYSTEM_DISK:-public}
+      # Mail configuration
+      - MAIL_MAILER=${MAIL_MAILER:-log}
+      # Proxy/Trusted proxy settings for Coolify
+      - TRUSTED_PROXIES=*
+      - TRUST_PROXY=true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/up || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mysql:
+    image: mysql:8.0
+    container_name: ${COMPOSE_PROJECT_NAME:-laravel-blog}-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_MYSQLROOT}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_MYSQLROOT}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+    driver: local
+  storage:
+    driver: local
+  bootstrap_cache:
+    driver: local
