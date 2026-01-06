@@ -15,11 +15,10 @@
     <!-- Centered Single Column Layout -->
     <div class="max-w-4xl mx-auto">
         
-        <!-- Featured Image Section -->
+        <!-- Featured Image Section - Author Profile Photo -->
         <div class="mb-12 rounded-2xl overflow-hidden shadow-lg h-64 md:h-96 bg-gray-50 border border-gray-100">
-            <!-- TODO: Replace this source with your specific image URL -->
-            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-                 alt="About Me" 
+            <img src="{{ $user->profile_photo_url }}" 
+                 alt="{{ $user->name }}" 
                  class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
         </div>
 
