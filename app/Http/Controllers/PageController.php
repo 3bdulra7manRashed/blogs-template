@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactFormRequest;
+use App\Mail\ContactMessage;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
@@ -46,13 +48,27 @@ class PageController extends Controller
     {
         $validated = $request->validated();
 
-        // TODO: Configure mail settings and create ContactMail mailable
-        // Mail::to(config('mail.from.address'))->send(new ContactMail($validated));
+        try {
+            // Send email to the site owner
+            Mail::to(config('mail.from.address'))->send(new ContactMessage($validated));
 
-        // Optional: Store contact messages in database
-        // ContactMessage::create($validated);
+            Log::info('Contact form submitted', [
+                'from' => $validated['email'],
+                'name' => $validated['name'],
+            ]);
 
-        return back()->with('success', 'شكراً لرسالتك. سنقوم بالرد عليك قريباً!');
+            return back()->with('success', 'شكراً لرسالتك. سيتم الرد عليك قريباً!');
+        } catch (\Exception $e) {
+            Log::error('Failed to send contact email', [
+                'error' => $e->getMessage(),
+                'from' => $validated['email'],
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى لاحقاً.');
+        }
     }
 }
+
 

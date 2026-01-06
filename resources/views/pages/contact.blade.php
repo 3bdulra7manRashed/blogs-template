@@ -19,9 +19,9 @@
             <!-- Contact Form Section -->
             <div class="w-full p-8 md:p-12">
                 @if(session('success'))
-                    <div class="mb-8 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800">
+                    <div class="mb-8 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800 font-sans">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="font-medium">{{ session('success') }}</span>
+                        <span class="font-bold">شكراً لرسالتك. سيتم الرد عليك قريباً!</span>
                     </div>
                 @endif
 
